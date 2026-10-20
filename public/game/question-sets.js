@@ -1,0 +1,2 @@
+export function questionSets(bank){const sets=[{id:'all',title:'All questions',detail:`${bank.length} questions`,questions:bank}];for(let i=0;i<bank.length;i+=8)sets.push({id:'set-'+(i/8+1),title:'Set '+(i/8+1),detail:`Questions ${i+1}–${Math.min(i+8,bank.length)}`,questions:bank.slice(i,i+8)});return sets;}
+export function selectQuestions(bank,id='all'){return questionSets(bank).find(s=>s.id===id)?.questions||bank;}

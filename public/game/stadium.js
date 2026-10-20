@@ -1,0 +1,67 @@
+import * as T from './vendor/three.module.js';
+import {AthleteLibrary,animationIntent} from './athletes.js';
+import {COLOURS} from './engine.js';
+import {trackFrame,TRACK_LENGTH,runnerProgress} from './track.js';
+const ease=x=>x*x*(3-2*x);
+export class Stadium{
+ constructor(container){this.container=container;this.renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.05;container.append(this.renderer.domElement);this.scene=new T.Scene();this.scene.background=new T.Color(0x9bd4fa);this.scene.fog=new T.Fog(0x9bd4fa,120,350);this.scene.add(new T.HemisphereLight(0xfffbec,0x7eab95,2.5));const light=new T.DirectionalLight(0xffedd6,3.2);light.position.set(-22,38,18);this.scene.add(light);this.materials=new Map();this.runners=[];this.hurdles=[];this.stripes=[];this.time=0;this.travel=0;this.podiums=[];this.reducedMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;this.view='shared';this.makeWorld();this.athletes=new AthleteLibrary();this.camera=new T.PerspectiveCamera(43,1,.1,300);this.cameras=Array.from({length:4},()=>new T.PerspectiveCamera(48,1,.1,300));this.resize();window.addEventListener('resize',()=>this.resize());}
+ mat(col){if(!this.materials.has(col))this.materials.set(col,new T.MeshStandardMaterial({color:col,roughness:.72}));return this.materials.get(col);}
+ box(w,h,d,col,x=0,y=0,z=0,r=0){let geo;if(r>0){const s=new T.Shape();const a=w/2,b=d/2;s.moveTo(-a+r,-b);s.lineTo(a-r,-b);s.quadraticCurveTo(a,-b,a,-b+r);s.lineTo(a,b-r);s.quadraticCurveTo(a,b,a-r,b);s.lineTo(-a+r,b);s.quadraticCurveTo(-a,b,-a,b-r);s.lineTo(-a,-b+r);s.quadraticCurveTo(-a,-b,-a+r,-b);geo=new T.ExtrudeGeometry(s,{depth:h,bevelEnabled:false,steps:1});geo.rotateX(-Math.PI/2);geo.translate(0,-h/2,0);}else geo=new T.BoxGeometry(w,h,d);const mesh=new T.Mesh(geo,this.mat(col));mesh.position.set(x,y,z);return mesh;}
+ ball(radius,col,x=0,y=0,z=0,scale=[1,1,1]){const mesh=new T.Mesh(new T.SphereGeometry(radius,20,14),this.mat(col));mesh.position.set(x,y,z);mesh.scale.set(...scale);return mesh;}
+ label(text,{width=320,height=96,bg='#effff5',color='#295347',size=29}={}){const c=document.createElement('canvas');c.width=width;c.height=height;const x=c.getContext('2d');x.fillStyle=bg;x.beginPath();x.roundRect(3,3,width-6,height-6,22);x.fill();x.fillStyle=color;x.font=`600 ${size}px Arial`;x.textAlign='center';x.textBaseline='middle';x.fillText(text,width/2,height/2);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const sprite=new T.Sprite(new T.SpriteMaterial({map:texture,transparent:true,depthTest:false}));sprite.scale.set(1.95,.58,1);return sprite;}
+ makeWorld(){const s=this.scene;
+s.add(this.box(500,.15,600,0x7bb883,55,-.22,-60));
+// Concentric stadium lanes: no transverse grid across the running surface.
+const oval=(radius)=>{const pts=[];for(let i=0;i<=80;i++){const a=i/80*Math.PI;pts.push([56+radius*Math.cos(a),30+radius*Math.sin(a)]);}for(let i=0;i<=80;i++){const a=Math.PI+i/80*Math.PI;pts.push([56+radius*Math.cos(a),-150+radius*Math.sin(a)]);}pts.push(pts[0]);return pts;};
+const ribbon=(inner,outer,col,y)=>{const a=oval(inner),b=oval(outer),v=[];for(let i=0;i<a.length-1;i++){for(const p of [a[i],b[i],a[i+1],b[i],b[i+1],a[i+1]])v.push(p[0],y,p[1]);}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(v,3));geo.computeVertexNormals();const mat=new T.MeshStandardMaterial({color:col,roughness:.95,side:T.DoubleSide});const m=new T.Mesh(geo,mat);s.add(m);};
+ribbon(42.7,73,0xe9dfc9,-.05);
+for(let lane=0;lane<8;lane++)ribbon(43.4+lane*3.6,47+lane*3.6,lane%2?0x257fc1:0x318ece,0);
+for(let lane=0;lane<=8;lane++)ribbon(43.4+lane*3.6-.035,43.4+lane*3.6+.035,0xfff7e7,.014);
+// Lane numbers and start / finish markings painted flat on the track.
+for(let lane=0;lane<8;lane++){const x=10.8-lane*3.6;const c=document.createElement('canvas');c.width=128;c.height=192;const ctx=c.getContext('2d');ctx.fillStyle='#fff9e9';ctx.font='bold 140px Arial';ctx.textAlign='center';ctx.fillText(String(lane+1),64,145);const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;const mesh=new T.Mesh(new T.PlaneGeometry(1.4,2.1),new T.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false}));mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.025,14);s.add(mesh);
+for(const z of [10,-90]){s.add(this.box(2,.025,.10,0xf9e7b5,x,.025,z));}s.add(this.box(.10,.025,1.1,0xe9c242,x,.027,-55-lane*.3));}
+s.add(this.box(28.8,.025,.20,0xfff7e7,-1.8,.025,18));
+for(let i=0;i<36;i++)s.add(this.box(.8,.02,.6,i%2?0xfff7e7:0x364944,-15.8+i*.8,.03,20));
+// Mown infield, football markings and goals establish a real athletics arena.
+for(let i=0;i<12;i++)s.add(this.box(72,.02,12,i%2?0x83bf89:0x79b580,56,-.08,-132+i*12));
+for(const x of [20,92])s.add(this.box(.12,.03,140,0xe4f0d4,x,-.04,-60));for(const z of [-130,10,-60])s.add(this.box(72,.03,.12,0xe4f0d4,56,-.04,z));
+const circle=new T.Mesh(new T.RingGeometry(9.9,10.05,64),this.mat(0xe4f0d4));circle.rotation.x=-Math.PI/2;circle.position.set(56,-.03,-60);s.add(circle);
+for(const z of [-130,10]){for(const x of [51,61])s.add(this.box(.16,4,.16,0xf4f7e8,x,2,z));s.add(this.box(10,.16,.16,0xf4f7e8,56,4,z));}
+for(const side of [-1,1]){const x=side===-1?-27:139;
+s.add(this.box(16,.25,210,0xe3dac0,x,-.03,-60));for(let row=0;row<7;row++){const offset=side*row*.9;s.add(this.box(2,.55,205,[0x629b9d,0xd4ded0,0x91b7b9][row%3],x+offset,.3+row*.55,-60));for(let i=0;i<22;i++){s.add(this.ball(.28,[0xf1b272,0x77b6c1,0x9c9fc5,0x76b591,0xd69e9a][(i+row)%5],x+offset,.95+row*.55,35-i*9,[1,1.3,1]));}}
+s.add(this.box(11,.20,215,0xe9eee4,x+side*3,5.3,-60));
+for(let i=0;i<8;i++){const tree=new T.Group();tree.add(this.box(.45,3,.45,0xaf9676,0,1.4,0));tree.add(this.ball(2.2,0x68a37b,0,4,0,[1,1.3,1]));tree.add(this.ball(1.5,0x82b18b,1,4.3,.3));tree.position.set(x+side*18,0,40-i*30);s.add(tree);}
+for(let i=0;i<5;i++){s.add(this.box(.12,10,.12,0xe8eee2,x-side*8,5,25-i*45));s.add(this.box(1.8,.9,.05,[0xe2be72,0x87b7a2,0xcc9299,0x9eabd0][i%4],x-side*8+.9,9.3,25-i*45));}}
+const board=new T.Group();board.add(this.box(14,5,.5,0x315e59,0,7,0,.3));for(const x of [-5,5])board.add(this.box(.3,7,.3,0x6a8e7b,x,3.5,0));const title=this.label('THE CHASE',{width:640,height:180,bg:'#27534e',color:'#e9f2c8',size:60});title.scale.set(12,3.5,1);title.position.set(0,7,.4);board.add(title);board.position.set(56,0,-225);s.add(board);
+for(let i=0;i<8;i++){const cloud=new T.Group();for(let j=0;j<3;j++)cloud.add(this.ball(3,0xf0f4ec,j*3,0,j%2,[1.8,.5,1]));cloud.position.set((i%2?150:-45),30+i%3*5,40-i*37);s.add(cloud);}
+for(let lane=0;lane<3;lane++){const g=new T.Group();g.add(this.box(3.2,.22,.2,0xfbfff9,0,1.05,0,.05));for(const side of [-1,1]){g.add(this.box(.13,1,.16,0xf1f8ec,side*1.4,.5,0));g.add(this.box(.26,.10,1.1,0x6198a0,side*1.4,.1,-.3));}for(let j=0;j<5;j++)g.add(this.box(.30,.23,.22,0x588e99,-1.2+j*.6,1.05,.01));const a=this.label(['A','B','C'][lane],{width:100,height:100,bg:'#f5fff4',color:'#375e4f',size:60});a.scale.set(.85,.85,1);a.position.set(0,2.5,0);g.add(a);s.add(g);this.hurdles.push(g);}
+for(let rank=1;rank<=4;rank++){const x=[0,-2.65,2.65,5.25][rank-1],height=[1.5,1,.65,.22][rank-1];const g=new T.Group();g.add(this.box(2.3,height,2,rank===1?0xd6b76a:0xd9e8df,x,height/2,0,.2));const label=this.label(String(rank),{width:100,height:100,bg:rank===1?'#d6b76a':'#d9e8df',color:'#315b51',size:65});label.scale.set(.65,.65,1);label.position.set(x,height/2,1.02);g.add(label);g.visible=false;s.add(g);this.podiums.push(g);}
+ }
+ async loadCharacters(progress){await this.athletes.load(progress);this.athletes.makePortraits(this.renderer);this.resize();this.setCharacters();}
+ makeRunner(index,slot){const g=new T.Group(),actor=this.athletes.create(index),color=COLOURS[slot];actor.model.rotation.y=Math.PI;g.add(actor.model);const shadow=new T.Mesh(new T.CircleGeometry(.64,30),new T.MeshBasicMaterial({color:0x4b6860,transparent:true,opacity:.18,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.y=.025;const ring=new T.Mesh(new T.RingGeometry(.69,.76,36),new T.MeshBasicMaterial({color,transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=.04;const tag=this.label('P'+(slot+1),{bg:color,color:'#fff',size:40});tag.scale.set(1.05,.35,1);tag.position.y=3;g.add(tag);this.scene.add(g,shadow,ring);return {g,actor,shadow,ring,tag,color,index};}
+ setCharacters(indices=[0,1,2,3]){const values=[0,1,2,3].map((v,i)=>indices?.[i]??v);if(this.characterKey===values.join())return;this.characterKey=values.join();for(const a of this.runners){this.scene.remove(a.g,a.shadow,a.ring);a.actor.dispose();a.tag.material.map.dispose();a.tag.material.dispose();a.shadow.geometry.dispose();a.shadow.material.dispose();a.ring.geometry.dispose();a.ring.material.dispose();}this.runners=values.map((v,i)=>this.makeRunner(v,i));}
+ resize(){this.width=this.container.clientWidth;this.height=this.container.clientHeight;this.renderer.setSize(this.width,this.height,false);}
+ update(dt,race){
+ if(!race?.paused)this.time+=dt;const t=this.time,finished=!!race?.finished;
+ const entities=race?[...race.players,...race.ai]:Array.from({length:4},(_,i)=>({id:i,lane:[0,1,2,1][i],jogging:true,rank:i+1}));
+ // Use actual progress, so the complete stadium passes the runners and cameras together.
+ this.travel=race?Math.max(...race.players.map(p=>p.distance)):0;
+ this.podiums.forEach((p,i)=>p.visible=finished&&i<entities.length);
+ entities.forEach((p,i)=>{const a=this.runners[i];if(!a)return;const lane=p.ai?i%3:p.lane;const same=entities.filter((e,j)=>(e.ai?j%3:e.lane)===lane);const offset=same.length>1?(same.indexOf(p)-(same.length-1)/2)*.83:0;
+ let x=(lane-1)*3.6+offset,y=0,z=(p.rank-1)*.85-1.8;
+ a.actor.play(animationIntent(p,race,entities.length));a.actor.update(race.paused?0:this.reducedMotion&&finished?0:dt);
+ if(finished){x=[0,-2.65,2.65,5.25][p.rank-1];y=[1.5,1,.65,.22][p.rank-1];z=0;a.g.rotation.y=Math.PI;a.g.position.set(x,y,z);a.ring.visible=false;a.shadow.visible=false;}
+ else{if(p.laneTween<1)x=((p.fromLane-1)+(p.lane-p.fromLane)*ease(p.laneTween))*3.6+offset;const f=trackFrame(runnerProgress(p.distance??0,this.travel),x);a.g.rotation.y=f.yaw;a.g.position.set(f.x,0,f.z);a.shadow.position.set(f.x,.025,f.z);a.ring.position.set(f.x,.04,f.z);a.shadow.visible=!p.caught;a.ring.visible=!p.caught;}
+ a.g.visible=finished||!p.caught;a.tag.visible=!!race;const title=(p.ai?'AI · ':'P'+(p.id+1)+' · ')+p.name;
+ if(a.labelText!==title){const tag=this.label(title,{bg:a.color,color:'#ffffff',size:26});a.tag.material.map.dispose();a.tag.material.map=tag.material.map;a.tag.material.needsUpdate=true;a.tag.scale.set(1.7,.42,1);tag.material.dispose();a.labelText=title;}
+ });
+ for(let i=entities.length;i<this.runners.length;i++){this.runners[i].g.visible=false;this.runners[i].shadow.visible=false;this.runners[i].ring.visible=false;}
+ this.hurdles.forEach((h,i)=>{h.visible=race?.phase==='approach';const ahead=70-(race?race.phaseTime/race.actionDuration:0)*69.4;const f=trackFrame(this.travel+ahead,(i-1)*3.6);h.position.set(f.x,0,f.z);h.rotation.y=f.yaw;});
+ const r=this.renderer;r.setScissorTest(false);r.setViewport(0,0,this.width,this.height);
+ const positionCamera=(cam,aspect,fov,x,y,z,lookAhead)=>{cam.aspect=aspect;cam.fov=fov;const pos=trackFrame(this.travel-z,x),target=trackFrame(this.travel+lookAhead,0);cam.position.set(pos.x,y,pos.z);cam.lookAt(target.x,1,target.z);cam.updateProjectionMatrix();};
+ if(finished){r.clear();const portrait=this.width<650;const w=portrait?this.width:this.width*.55,h=portrait?this.height*.40:this.height;r.setViewport(0,portrait?this.height-h:0,w,h);r.setScissor(0,portrait?this.height-h:0,w,h);r.setScissorTest(true);this.camera.aspect=w/h;this.camera.fov=portrait?46:43;this.camera.position.set(1.2,6.2,Math.max(16,13/(w/h)));this.camera.lookAt(1.2,1.7,0);this.camera.updateProjectionMatrix();r.render(this.scene,this.camera);r.setScissorTest(false);return;}
+ if(!race){this.camera.aspect=this.width/this.height;this.camera.fov=this.width<650?48:43;this.camera.position.set(12,7.5,27);this.camera.lookAt(1,1.1,1);this.camera.updateProjectionMatrix();r.render(this.scene,this.camera);return;}
+ positionCamera(this.camera,this.width/this.height,this.width<600&&this.height>this.width?66:45,0,9.2,19,11);r.render(this.scene,this.camera);
+ if(this.view==='split'&&race.players.length>1){const n=race.players.length,rows=n===2?1:2;const top=this.splitTop??(this.width<600&&this.height>this.width?310:this.height<500?190:238);const bottom=this.width<600&&this.height>this.width?230:this.height<500?110:175;const available=Math.max(90,this.height-top-bottom);r.setScissorTest(true);for(let i=0;i<n;i++){const w=this.width/2,h=available/rows,x=(i%2)*w,y=this.height-top-(Math.floor(i/2)+1)*h,cam=this.cameras[i];const fov=Math.max(15,Math.min(75,2*Math.atan(Math.tan(Math.PI/5)/(w/h))*180/Math.PI));positionCamera(cam,w/h,fov,(race.players[i].lane-1)*.4,8.7,21,6);r.setViewport(x,y,w-2,h-2);r.setScissor(x,y,w-2,h-2);this.runners.forEach((a,j)=>a.ring.material.opacity=j===i?1:.45);r.render(this.scene,cam);}r.setScissorTest(false);}else this.runners.forEach(a=>a.ring.material.opacity=.85);
+ }
+}

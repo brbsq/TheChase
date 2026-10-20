@@ -1,0 +1,16 @@
+{
+  "name": "the-chase",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "build": "node scripts/build-pages.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
+    "preview": "node server.mjs",
+    "test:firebase": "node --test tests/firebase-rules.mjs"
+  }
+}

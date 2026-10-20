@@ -1,0 +1,418 @@
+{
+  "format": "glTF 2.0 binary",
+  "units": "metres",
+  "up": "+Y",
+  "forward": "+Z",
+  "fps": 30,
+  "rootMotion": "In place; jump includes vertical motion; collision and fall recover",
+  "characters": [
+    {
+      "id": "green",
+      "name": "Green sprinter",
+      "subtitle": "Black textured crop · warm brown skin",
+      "colour": "#237735",
+      "dark": "#137537",
+      "skin": "#bc7138",
+      "hair": "#201e1b",
+      "iris": "#000000",
+      "style": "crop",
+      "gender": "boy",
+      "reference": "green.png",
+      "file": "green.glb",
+      "bytes": 1248404,
+      "triangles": 27058,
+      "meshes": 29,
+      "joints": 16,
+      "animations": [
+        {
+          "name": "run",
+          "label": "Run",
+          "duration": 0.72,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "label": "Walk",
+          "duration": 1.25,
+          "loop": true
+        },
+        {
+          "name": "stop",
+          "label": "Stop",
+          "duration": 1.1,
+          "loop": false
+        },
+        {
+          "name": "jump",
+          "label": "Hurdle jump",
+          "duration": 1.55,
+          "loop": false
+        },
+        {
+          "name": "collision",
+          "label": "Collision",
+          "duration": 1.25,
+          "loop": false
+        },
+        {
+          "name": "fall",
+          "label": "Fall down",
+          "duration": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "label": "Cheering",
+          "duration": 2.2,
+          "loop": true
+        },
+        {
+          "name": "sob",
+          "label": "Sobbing",
+          "duration": 2.6,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue sprinter",
+      "subtitle": "Side-parted brown hair · blue eyes",
+      "colour": "#244bae",
+      "dark": "#224aa3",
+      "skin": "#f0d2b6",
+      "hair": "#775324",
+      "iris": "#5076c8",
+      "style": "part",
+      "gender": "boy",
+      "reference": "blue.png",
+      "file": "blue.glb",
+      "bytes": 1248916,
+      "triangles": 28498,
+      "meshes": 31,
+      "joints": 16,
+      "animations": [
+        {
+          "name": "run",
+          "label": "Run",
+          "duration": 0.72,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "label": "Walk",
+          "duration": 1.25,
+          "loop": true
+        },
+        {
+          "name": "stop",
+          "label": "Stop",
+          "duration": 1.1,
+          "loop": false
+        },
+        {
+          "name": "jump",
+          "label": "Hurdle jump",
+          "duration": 1.55,
+          "loop": false
+        },
+        {
+          "name": "collision",
+          "label": "Collision",
+          "duration": 1.25,
+          "loop": false
+        },
+        {
+          "name": "fall",
+          "label": "Fall down",
+          "duration": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "label": "Cheering",
+          "duration": 2.2,
+          "loop": true
+        },
+        {
+          "name": "sob",
+          "label": "Sobbing",
+          "duration": 2.6,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "id": "coral",
+      "name": "Coral sprinter",
+      "subtitle": "Chocolate fringe · golden skin",
+      "colour": "#fa5035",
+      "dark": "#b7352b",
+      "skin": "#efb973",
+      "hair": "#3d281a",
+      "iris": "#000000",
+      "style": "fringe",
+      "gender": "boy",
+      "reference": "coral.png",
+      "file": "coral.glb",
+      "bytes": 1248396,
+      "triangles": 27058,
+      "meshes": 29,
+      "joints": 16,
+      "animations": [
+        {
+          "name": "run",
+          "label": "Run",
+          "duration": 0.72,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "label": "Walk",
+          "duration": 1.25,
+          "loop": true
+        },
+        {
+          "name": "stop",
+          "label": "Stop",
+          "duration": 1.1,
+          "loop": false
+        },
+        {
+          "name": "jump",
+          "label": "Hurdle jump",
+          "duration": 1.55,
+          "loop": false
+        },
+        {
+          "name": "collision",
+          "label": "Collision",
+          "duration": 1.25,
+          "loop": false
+        },
+        {
+          "name": "fall",
+          "label": "Fall down",
+          "duration": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "label": "Cheering",
+          "duration": 2.2,
+          "loop": true
+        },
+        {
+          "name": "sob",
+          "label": "Sobbing",
+          "duration": 2.6,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "id": "rose",
+      "name": "Rose sprinter",
+      "subtitle": "Chestnut bob · dark eyes",
+      "colour": "#ff7478",
+      "dark": "#b5476b",
+      "skin": "#efd0b5",
+      "hair": "#473021",
+      "iris": "#000000",
+      "style": "bob",
+      "gender": "girl",
+      "reference": "rose.png",
+      "file": "rose.glb",
+      "bytes": 1311468,
+      "triangles": 30394,
+      "meshes": 34,
+      "joints": 16,
+      "animations": [
+        {
+          "name": "run",
+          "label": "Run",
+          "duration": 0.72,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "label": "Walk",
+          "duration": 1.25,
+          "loop": true
+        },
+        {
+          "name": "stop",
+          "label": "Stop",
+          "duration": 1.1,
+          "loop": false
+        },
+        {
+          "name": "jump",
+          "label": "Hurdle jump",
+          "duration": 1.55,
+          "loop": false
+        },
+        {
+          "name": "collision",
+          "label": "Collision",
+          "duration": 1.25,
+          "loop": false
+        },
+        {
+          "name": "fall",
+          "label": "Fall down",
+          "duration": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "label": "Cheering",
+          "duration": 2.2,
+          "loop": true
+        },
+        {
+          "name": "sob",
+          "label": "Sobbing",
+          "duration": 2.6,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "id": "sky",
+      "name": "Sky sprinter",
+      "subtitle": "Long blonde hair · green eyes",
+      "colour": "#73bceb",
+      "dark": "#397fbc",
+      "skin": "#f4d9bd",
+      "hair": "#c8a85b",
+      "iris": "#279754",
+      "style": "long",
+      "gender": "girl",
+      "reference": "sky.png",
+      "file": "sky.glb",
+      "bytes": 1312000,
+      "triangles": 31834,
+      "meshes": 36,
+      "joints": 16,
+      "animations": [
+        {
+          "name": "run",
+          "label": "Run",
+          "duration": 0.72,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "label": "Walk",
+          "duration": 1.25,
+          "loop": true
+        },
+        {
+          "name": "stop",
+          "label": "Stop",
+          "duration": 1.1,
+          "loop": false
+        },
+        {
+          "name": "jump",
+          "label": "Hurdle jump",
+          "duration": 1.55,
+          "loop": false
+        },
+        {
+          "name": "collision",
+          "label": "Collision",
+          "duration": 1.25,
+          "loop": false
+        },
+        {
+          "name": "fall",
+          "label": "Fall down",
+          "duration": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "label": "Cheering",
+          "duration": 2.2,
+          "loop": true
+        },
+        {
+          "name": "sob",
+          "label": "Sobbing",
+          "duration": 2.6,
+          "loop": true
+        }
+      ]
+    },
+    {
+      "id": "sunshine",
+      "name": "Sunshine sprinter",
+      "subtitle": "Black wavy hair · golden brown skin",
+      "colour": "#ffdb36",
+      "dark": "#b58a14",
+      "skin": "#d99943",
+      "hair": "#201f1d",
+      "iris": "#000000",
+      "style": "wave",
+      "gender": "girl",
+      "reference": "sunshine.png",
+      "file": "sunshine.glb",
+      "bytes": 1332024,
+      "triangles": 29914,
+      "meshes": 34,
+      "joints": 16,
+      "animations": [
+        {
+          "name": "run",
+          "label": "Run",
+          "duration": 0.72,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "label": "Walk",
+          "duration": 1.25,
+          "loop": true
+        },
+        {
+          "name": "stop",
+          "label": "Stop",
+          "duration": 1.1,
+          "loop": false
+        },
+        {
+          "name": "jump",
+          "label": "Hurdle jump",
+          "duration": 1.55,
+          "loop": false
+        },
+        {
+          "name": "collision",
+          "label": "Collision",
+          "duration": 1.25,
+          "loop": false
+        },
+        {
+          "name": "fall",
+          "label": "Fall down",
+          "duration": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "label": "Cheering",
+          "duration": 2.2,
+          "loop": true
+        },
+        {
+          "name": "sob",
+          "label": "Sobbing",
+          "duration": 2.6,
+          "loop": true
+        }
+      ]
+    }
+  ]
+}
