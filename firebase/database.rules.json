@@ -7,17 +7,35 @@
         ".read": "auth != null && data.child('expires').val() > now && (data.child('ownerUid').val() === auth.uid || data.child('guestUid').val() === auth.uid)",
         ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || (data.child('ownerUid').val() === auth.uid && (!newData.exists() || newData.child('ownerUid').val() === auth.uid)))",
         ".validate": "newData.hasChildren(['ownerUid','createdAt','expires','pinExpires','pin','players','offer']) && newData.child('expires').val() <= newData.child('createdAt').val() + 600000 && newData.child('pinExpires').val() <= newData.child('createdAt').val() + 300000",
-        "ownerUid": {".validate": "newData.isString() && newData.val().length <= 128"},
-        "createdAt": {".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() <= now + 5000 && newData.val() >= now - 15000)"},
-        "expires": {".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() > now)"},
-        "pinExpires": {".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() > now)"},
-        "pin": {".validate": "newData.isString() && newData.val().matches(/^[0-9]{6}$/)"},
-        "players": {".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 4"},
+        "ownerUid": {
+          ".validate": "newData.isString() && newData.val().length <= 128"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() <= now + 5000 && newData.val() >= now - 15000)"
+        },
+        "expires": {
+          ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() > now)"
+        },
+        "pinExpires": {
+          ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() > now)"
+        },
+        "pin": {
+          ".validate": "newData.isString() && newData.val().matches(/^[0-9]{6}$/)"
+        },
+        "players": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 4"
+        },
         "offer": {
           ".validate": "newData.hasChildren(['type','sdp'])",
-          "type": {".validate": "newData.val() === 'offer'"},
-          "sdp": {".validate": "newData.isString() && newData.val().length <= 95000"},
-          "$other": {".validate": false}
+          "type": {
+            ".validate": "newData.val() === 'offer'"
+          },
+          "sdp": {
+            ".validate": "newData.isString() && newData.val().length <= 95000"
+          },
+          "$other": {
+            ".validate": false
+          }
         },
         "guestUid": {
           ".read": "auth != null && root.child('pairings').child($id).child('expires').val() > now",
@@ -27,11 +45,19 @@
         "answer": {
           ".write": "auth != null && !data.exists() && root.child('pairings').child($id).child('guestUid').val() === auth.uid && root.child('pairings').child($id).child('expires').val() > now",
           ".validate": "newData.hasChildren(['type','sdp'])",
-          "type": {".validate": "newData.val() === 'answer'"},
-          "sdp": {".validate": "newData.isString() && newData.val().length <= 95000"},
-          "$other": {".validate": false}
+          "type": {
+            ".validate": "newData.val() === 'answer'"
+          },
+          "sdp": {
+            ".validate": "newData.isString() && newData.val().length <= 95000"
+          },
+          "$other": {
+            ".validate": false
+          }
         },
-        "$other": {".validate": false}
+        "$other": {
+          ".validate": false
+        }
       }
     },
     "pins": {
@@ -39,10 +65,18 @@
         ".read": "auth != null",
         ".write": "auth != null && ((!newData.exists() && data.child('ownerUid').val() === auth.uid) || (newData.exists() && (!data.exists() || data.child('expires').val() <= now) && newData.child('ownerUid').val() === auth.uid))",
         ".validate": "$pin.matches(/^[0-9]{6}$/) && newData.hasChildren(['id','ownerUid','expires']) && newData.child('expires').val() > now && newData.child('expires').val() <= now + 310000 && root.child('pairings').child(newData.child('id').val()).child('ownerUid').val() === auth.uid && root.child('pairings').child(newData.child('id').val()).child('pin').val() === $pin",
-        "id": {".validate": "newData.isString() && newData.val().length === 36"},
-        "ownerUid": {".validate": "newData.val() === auth.uid"},
-        "expires": {".validate": "newData.isNumber()"},
-        "$other": {".validate": false}
+        "id": {
+          ".validate": "newData.isString() && newData.val().length === 36"
+        },
+        "ownerUid": {
+          ".validate": "newData.val() === auth.uid"
+        },
+        "expires": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
       }
     },
     "questionBanks": {
@@ -50,13 +84,26 @@
         ".read": "auth != null && auth.uid === $uid && auth.token.firebase.sign_in_provider !== 'anonymous'",
         "custom": {
           ".write": "auth != null && auth.uid === $uid && auth.token.firebase.sign_in_provider !== 'anonymous'",
-          ".validate": "newData.hasChildren(['questionsJSON','revision','updatedAt']) && newData.child('revision').val() === (data.exists() ? data.child('revision').val() + 1 : 1)",
-          "questionsJSON": {".validate": "newData.isString() && newData.val().length <= 100000"},
-          "revision": {".validate": "newData.isNumber()"},
-          "updatedAt": {".validate": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 15000"},
-          "$other": {".validate": false}
+          ".validate": "newData.hasChildren(['revision','updatedAt']) && (newData.hasChild('setsJSON') || newData.hasChild('questionsJSON')) && !(newData.hasChild('setsJSON') && newData.hasChild('questionsJSON')) && newData.child('revision').val() === (data.exists() ? data.child('revision').val() + 1 : 1)",
+          "questionsJSON": {
+            ".validate": "newData.isString() && newData.val().length <= 100000"
+          },
+          "revision": {
+            ".validate": "newData.isNumber()"
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 15000"
+          },
+          "$other": {
+            ".validate": false
+          },
+          "setsJSON": {
+            ".validate": "newData.isString() && newData.val().length <= 1000000"
+          }
         },
-        "$other": {".validate": false}
+        "$other": {
+          ".validate": false
+        }
       }
     }
   }

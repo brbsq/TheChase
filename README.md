@@ -37,7 +37,7 @@ Video stays on the camera device. Only derived movement events go over the WebRT
 
 ### Question banks
 
-Open Question Bank and sign in with Google. Each teacher owns a private custom bank that syncs between their signed-in devices. Anonymous camera identities cannot read or modify those banks. Edits retain three confirmation steps; Firebase saves use revision checks to reject overwriting a newer device's version. Existing local questions remain usable; Save this device's bank to Firebase migrates them after confirmation. Loading a cloud bank keeps a backup of the former local bank under `sprint-custom-backup` in browser storage. Starter packs are bundled samples and do not claim curriculum certification.
+Open Question Bank and sign in with Google. Each teacher owns a private library of named question sets that syncs between their signed-in devices. Anonymous camera identities cannot read or modify those banks. Edits and selected deletions stay in an unsaved batch. One three-step confirmation commits the whole batch; Firebase saves use revision checks to reject overwriting a newer device's version. Legacy local questions migrate to a separate Custom set. Every JSON paste/import creates a new set with editable title and Year/category; existing sets are not appended to. Saved categories and titles appear in race selection. Existing local questions remain usable; Save this device's bank to Firebase migrates them after confirmation. Loading a cloud bank keeps a backup of the former local bank under `sprint-custom-backup` in browser storage. Starter packs are bundled samples and do not claim curriculum certification.
 
 ## Tests
 
@@ -63,3 +63,5 @@ Keyboard: P1 arrows / Space / R; P2 A D / W / S; P3 J L / I / K; P4 F H / T / G.
 - [Firebase database rules](https://firebase.google.com/docs/database/security/rules-conditions)
 - [Google sign-in](https://firebase.google.com/docs/auth/web/google-signin)
 - [GitHub Pages custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
+
+Player names are replaced with P1–P4 IDs and clear AI labels. The in-race player card is removed, keyboard controls use a compact centered dock with larger buttons, and pause uses an SVG two-bar icon.
