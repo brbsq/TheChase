@@ -8,12 +8,13 @@ export class MotionInterpreter{
  lock(poses,index,id){const f=this.features(poses[index]);if(!f||id<0||id>=this.count)return false;const assigned=this.assign(poses),previous=assigned.indexOf(poses[index]);if(previous>=0&&previous!==id){const oldBaseline=this.baselines[id],oldAnchor=this.anchors[id];this.baselines[previous]=oldBaseline;this.anchors[previous]=oldAnchor;this.reset(previous);}this.baselines[id]={...f};this.anchors[id]={...f};this.reset(id);return true;}
  calibrate(poses){let assigned=this.assign(poses);if(assigned.some(p=>!p))assigned=poses.filter(p=>this.features(p)).sort((a,b)=>this.features(a).x-this.features(b).x).slice(0,this.count);const features=assigned.map(l=>this.features(l));if(features.length!==this.count||features.some(f=>!f))return false;this.baselines=features.map(f=>({...f}));this.anchors=features.map(f=>({...f}));this.states.forEach((_,i)=>this.reset(i));return true;}
  get calibrated(){return Array.from({length:this.count},(_,i)=>!!this.baselines[i]).every(Boolean);}
- update(poses,now){const assigned=this.assign(poses),events=[],players=[];for(let i=0;i<this.count;i++){const f=this.features(assigned[i]),b=this.baselines[i],s=this.states[i];if(f)this.anchors[i]={...f};if(!f||!b){players.push({id:i,tracked:!!f,jogging:false,locked:!!b});continue;}const knee=f.knee>.075?1:f.knee<-.075?-1:0;if(knee&&knee!==s.lastKnee){s.lastJog=now;s.lastKnee=knee;}
+ update(poses,now){const assigned=this.assign(poses),events=[],players=[];for(let i=0;i<this.count;i++){const f=this.features(assigned[i]),b=this.baselines[i],s=this.states[i];if(f)this.anchors[i]={...f};if(!f||!b){players.push({id:i,tracked:!!f,jogging:false,locked:!!b});continue;}// Small knee lifts relative to the locked stance; a deadband rejects tiny camera jitter.
+ const kneeMotion=f.knee-b.knee,knee=kneeMotion>.035?1:kneeMotion<-.035?-1:0;if(knee&&knee!==s.lastKnee){s.lastJog=now;s.lastKnee=knee;}else if(Math.abs(kneeMotion)<.018)s.lastKnee=0;
  const dx=(f.x-b.x)/b.torso,rise=(b.y-f.y)/b.torso,feetRise=Math.min(b.leftFoot-f.leftFoot,b.rightFoot-f.rightFoot)/b.torso;const airborne=rise>.085&&feetRise>.065;
  // A small lateral step is enough to switch lanes; vertical jumps still require BOTH feet.
  if(s.hopArmed&&Math.abs(dx)>.19&&now-s.lastHop>220){events.push({id:i,kind:dx<0?'left':'right'});s.hopArmed=false;s.lastHop=now;s.lastJog=now;if(airborne){s.armed=false;s.lastJump=now;}}
  else if(s.armed&&airborne&&now-s.lastJump>300){events.push({id:i,kind:'jump'});s.armed=false;s.lastJump=now;s.lastJog=now;}
  if(Math.abs(dx)<.11)s.hopArmed=true;
  if(rise<.045&&feetRise<.045){if(s.groundSince===null)s.groundSince=now;if(now-s.groundSince>=90)s.armed=true;}else s.groundSince=null;
- players.push({id:i,tracked:true,locked:true,jogging:now-s.lastJog<650});}return {events,players,detected:players.filter(p=>p.tracked).length};}
+ players.push({id:i,tracked:true,locked:true,jogging:now-s.lastJog<850});}return {events,players,detected:players.filter(p=>p.tracked).length};}
 }
