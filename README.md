@@ -65,3 +65,15 @@ Keyboard: P1 arrows / Space / R; P2 A D / W / S; P3 J L / I / K; P4 F H / T / G.
 - [GitHub Pages custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
 
 Player names are replaced with P1–P4 IDs and clear AI labels. The in-race player card is removed, keyboard controls use a compact centered dock with larger buttons, and pause uses an SVG two-bar icon.
+
+## Classroom control update
+
+Players stand anywhere their whole body is visible; there are no numbered standing zones. Tap a detected person to open P1–P4 assignment, or use Lock all players. The tracker matches bodies between frames rather than reassigning by screen section. Crossing or overlapping bodies can still confuse pose tracking; use re-lock to restore assignments.
+
+Pause includes Re-lock / reconnect camera, a live preview and Lock all players. It preserves the current race, score and timer. Phone cameras can receive a re-lock request, or pair again within the paused race. Resume after tracking loss requires a fresh calibrated frame with every active player visible.
+
+Motion sampling targets 30fps (hardware dependent), with smaller step/jump thresholds and faster jogging detection. Both feet must rise for a vertical answer jump. Sideways hops last 0.42s, lane changes take 0.36s, and a jump can immediately interrupt a hop. Input animation uses a short blend rather than waiting for the previous hop to finish.
+
+Solo choices glow yellow. Labelled player badges show each multiplayer choice; after the hurdle, green means correct plus jump and red means wrong or missed jump. A mixed outcome on one option shows separate coloured badges. Answer review groups responses per question and includes larger text, the correct answer and a simple explanation. All bundled questions have authored explanations; imported/manual questions can store optional explanations, with a basic answer recap otherwise. Original synthesized crowd cheers/aww accompany outcomes, alongside the existing impact sound. Clouds drift and trees sway, respecting reduced-motion preferences.
+
+Automated simulated-pose checks cover free-position assignments, individual locks, re-lock recovery, small motions, immediate keyboard actions and per-player outcome feedback. Real classroom camera latency and multi-person occlusion still require physical-device testing.
