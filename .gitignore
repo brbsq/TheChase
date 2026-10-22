@@ -43,3 +43,8 @@ yarn-error.log*
 
 # OS metadata
 .DS_Store
+
+# Firebase local state and potentially sensitive debug logs
+/.firebase/
+firebase-debug.log*
+*-debug.log

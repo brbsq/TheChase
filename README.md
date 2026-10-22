@@ -16,18 +16,19 @@ Local preview: `http://localhost:5178/game/`. GitHub Pages serves `dist/`; the r
 
 ## Firebase connection
 
-`public/game/firebase-config.js` contains the public Web SDK configuration. An empty config means cloud setup is pending: keyboard/laptop play and local question editing remain usable. Cloud pairing reports that setup is incomplete. Never put service-account keys or access tokens in this repository.
+Connected project: `thechase-brbsq` (TheChase), owned by the signed-in personal account. The project stays on the free Spark plan with billing disabled. Realtime Database is in Singapore (`asia-southeast1`). Anonymous authentication is enabled for camera pairing; Google sign-in is enabled for private teacher question banks. The approved sign-in domains are `brbsq.github.io`, `localhost` and `127.0.0.1`.
 
-Provision a Firebase project, register a web app, create Realtime Database (Singapore / `asia-southeast1` for this classroom), enable Anonymous and Google authentication, and add `brbsq.github.io` plus `localhost` to Authentication's authorized domains. Keep the project on its free Spark plan unless a paid service is explicitly requested.
+`public/game/firebase-config.js` contains the public Web SDK configuration. Never put service-account keys or access tokens in this repository. `.firebaserc` selects the project and `firebase/database.rules.json` contains the deployed access rules. Publish the game with GitHub Pages; Firebase provides the backend.
 
-Apply `firebase/database.rules.json` before using the game. To link the registered app's public config:
+To deploy backend changes:
 
 ```sh
-node scripts/configure-firebase.mjs path/to/public-web-config.json
-firebase deploy --only database --project YOUR_PROJECT_ID
+npx -y firebase-tools@latest deploy --only database,auth --project thechase-brbsq
 ```
 
-The configuration script writes `.firebaserc` and the web config. Push the linked config to publish it with Pages.
+In the currently installed CLI, auth deployment enables providers but does not apply `authorizedDomains`; verify any domain changes in Firebase Console → Authentication → Settings → Authorized domains. Keep this allowlist limited to approved game origins.
+
+Live disposable-account checks passed for anonymous sign-in, PIN lookup, private signaling, one camera claim, immutable answers and anonymous bank-write denial; test records/accounts were removed afterwards. Physical-device video/motion and teacher Google sign-in are separate browser checks.
 
 ### Camera pairing
 
@@ -37,7 +38,7 @@ Video stays on the camera device. Only derived movement events go over the WebRT
 
 ### Question banks
 
-Open Question Bank and sign in with Google. Each teacher owns a private library of named question sets that syncs between their signed-in devices. Anonymous camera identities cannot read or modify those banks. Edits and selected deletions stay in an unsaved batch. One three-step confirmation commits the whole batch; Firebase saves use revision checks to reject overwriting a newer device's version. Legacy local questions migrate to a separate Custom set. Every JSON paste/import creates a new set with editable title and Year/category; existing sets are not appended to. Saved categories and titles appear in race selection. Existing local questions remain usable; Save this device's bank to Firebase migrates them after confirmation. Loading a cloud bank keeps a backup of the former local bank under `sprint-custom-backup` in browser storage. Starter packs are bundled samples and do not claim curriculum certification.
+Open Question Bank and sign in with Google. Each teacher owns a private library of named question sets that syncs between their signed-in devices. Anonymous camera identities cannot read or modify those banks. Edits and selected deletions stay in an unsaved batch. One three-step confirmation commits the whole batch; Firebase saves use revision checks to reject overwriting a newer device's version. Legacy local questions migrate to a separate Custom set. Every JSON paste/import creates a new set with editable title and Year/category; existing sets are not appended to. Saved categories and titles appear in race selection. Existing local questions remain usable; Save this device's bank to Firebase migrates them after confirmation. Loading a cloud bank keeps a backup of the former local bank under `chase-question-sets-backup` in browser storage. Starter packs are bundled samples and do not claim curriculum certification.
 
 ## Tests
 
