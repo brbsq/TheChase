@@ -80,3 +80,5 @@ Solo choices glow yellow. Labelled player badges show each multiplayer choice; a
 Automated simulated-pose checks cover free-position assignments, individual locks, re-lock recovery, small motions, immediate keyboard actions and per-player outcome feedback. Real classroom camera latency and multi-person occlusion still require physical-device testing.
 
 Jogging uses a high-sensitivity knee-lift threshold relative to each locked stance, with a small deadband for tracking jitter. Small repeated lifts (including the same leg) refresh jogging, and an 850ms hold bridges a relaxed cadence. A held raised knee does not keep jogging indefinitely.
+
+Pages builds fingerprint local JavaScript/CSS and the complete import graph to avoid stale mixed client versions after deployment. Camera pairing identities use in-memory persistence; teacher sign-in prefers local storage with an in-memory fallback on storage-limited devices.
