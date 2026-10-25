@@ -12,4 +12,17 @@ test('Firebase rules protect pair ownership, one camera claim, expiry and teache
  assert.equal((await request('pairings/'+id,'intruder','DELETE')).status,401);assert.equal((await request('pairings/'+id,'host','DELETE')).status,200);
  await request('pairings/'+id,'owner','PUT',{...session,expires:now-1,pinExpires:now-1});assert.equal((await request('pairings/'+id+'/guestUid','late','PUT','late')).status,401,'expired room cannot be claimed');assert.equal((await request('pairings/'+id,'host')).status,401,'expired room cannot be read');
  const bank={questionsJSON:'[]',revision:1,updatedAt:Date.now()};assert.equal((await request('questionBanks/teacher/custom','teacher','PUT',bank,'google.com')).status,200,'teacher saves own bank');assert.equal((await request('questionBanks/teacher','other',undefined,undefined,'google.com')).status,401,'other teacher cannot read it');assert.equal((await request('questionBanks/student/custom','student','PUT',bank)).status,401,'anonymous camera cannot write teacher bank');assert.equal((await request('questionBanks/teacher/custom','teacher','PUT',{...bank,updatedAt:Date.now()},'google.com')).status,401,'stale revision rejected');assert.equal((await request('questionBanks/teacher/custom','teacher','PUT',{...bank,revision:2,updatedAt:Date.now()},'google.com')).status,200,'new revision accepted');
+ const shared={ownerUid:'teacher',slot:0,sourceId:'my-set',title:'Actions',category:'Year 1',questionsJSON:'[]',updatedAt:Date.now()};
+ assert.equal((await request('publicSets/teacher_0','teacher','PUT',shared,'google.com')).status,200,'Google teacher can explicitly publish');
+ assert.equal((await request('publicSets/teacher_0','visitor')).status,200,'published set is publicly readable');
+ assert.equal((await request('publicSets','visitor')).status,401,'unbounded listing denied');
+ const bounded=await fetch(base+'/publicSets.json?ns='+ns+'&orderBy='+encodeURIComponent('"updatedAt"')+'&limitToLast=30');assert.equal(bounded.status,200,'bounded community list is public');
+ assert.equal((await request('publicSets/teacher_0','intruder','PUT',{...shared,ownerUid:'intruder',updatedAt:Date.now()},'google.com')).status,401,'another teacher cannot overwrite');
+ assert.equal((await request('publicSets/teacher_0','intruder','DELETE',undefined,'google.com')).status,401,'another teacher cannot unpublish');
+ assert.equal((await request('publicSets/guest_0','guest','PUT',{...shared,ownerUid:'guest'})).status,401,'anonymous cameras cannot publish');
+ for(const invalid of [{title:'x'.repeat(91)},{questionsJSON:'x'.repeat(80001)},{slot:1},{ownerUid:'intruder'},{extra:'unexpected'}])assert.equal((await request('publicSets/teacher_0','teacher','PUT',{...shared,...invalid,updatedAt:Date.now()},'google.com')).status,401,'invalid public update rejected');
+ assert.equal((await request('publicSets/teacher_30','teacher','PUT',{...shared,slot:30,updatedAt:Date.now()},'google.com')).status,401,'public set count is bounded per owner');
+ assert.equal((await request('questionBanks/teacher','visitor')).status,401,'public sharing never exposes private banks');
+ assert.equal((await request('publicSets/teacher_0','teacher','DELETE',undefined,'google.com')).status,200,'owner can unpublish');
+
 });

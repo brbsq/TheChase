@@ -105,6 +105,41 @@
           ".validate": false
         }
       }
+    },
+    "publicSets": {
+      ".indexOn": [
+        "updatedAt"
+      ],
+      ".read": "query.orderByChild === 'updatedAt' && query.limitToLast != null && query.limitToLast <= 30",
+      "$key": {
+        ".read": true,
+        ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && (data.exists() ? data.child('ownerUid').val() === auth.uid : newData.child('ownerUid').val() === auth.uid) && (!newData.exists() || $key === auth.uid + '_' + newData.child('slot').val())",
+        ".validate": "newData.hasChildren(['ownerUid','slot','sourceId','title','category','questionsJSON','updatedAt'])",
+        "ownerUid": {
+          ".validate": "newData.val() === auth.uid"
+        },
+        "slot": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 30 && newData.val() % 1 === 0"
+        },
+        "title": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 90"
+        },
+        "category": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60"
+        },
+        "questionsJSON": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80000"
+        },
+        "updatedAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 15000"
+        },
+        "$other": {
+          ".validate": false
+        },
+        "sourceId": {
+          ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_-]{1,80}$/)"
+        }
+      }
     }
   }
 }

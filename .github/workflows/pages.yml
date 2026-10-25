@@ -22,6 +22,12 @@ jobs:
         with:
           node-version: 22
       - run: npm test
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Verify Firebase access rules
+        run: npx -y firebase-tools@15.34.0 emulators:exec --only database --project demo-thechase 'node --test tests/firebase-rules.mjs'
       - run: npm run build:pages
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

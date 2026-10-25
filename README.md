@@ -82,3 +82,13 @@ Automated simulated-pose checks cover free-position assignments, individual lock
 Jogging uses a high-sensitivity knee-lift threshold relative to each locked stance, with a small deadband for tracking jitter. Small repeated lifts (including the same leg) refresh jogging, and an 850ms hold bridges a relaxed cadence. A held raised knee does not keep jogging indefinitely.
 
 Pages builds fingerprint local JavaScript/CSS and the complete import graph to avoid stale mixed client versions after deployment. Camera pairing identities use in-memory persistence; teacher sign-in prefers local storage with an in-memory fallback on storage-limited devices.
+
+### Classroom camera and community updates
+
+Pair Device opens a dedicated PIN/QR connection and camera test, independent of race settings. The WebRTC connection stays open between races; player-count changes reset camera locks on the phone. The paired preview is sent directly over WebRTC, with no Firebase video storage. Motion still runs on the camera device. Both devices must keep their browser open.
+
+Camera hops use the opposite horizontal direction and a smaller lateral threshold, with a centre deadband before the next hop. Lock all captures all currently detected full bodies, even if some selected players are temporarily missing; starting still requires every selected player to be visible and locked.
+
+Keyboard/touch mode shows one independent control group per human player. Settings checks camera availability and shows current device connection status.
+
+The Public Question Bank reads the latest 30 opt-in community sets. Google-authenticated owners may publish up to 30 bounded sets and unpublish their own entries. Existing private banks are never automatically published. Publishing requires a saved set plus the public-sharing checkbox; copying a community set creates a new private draft for review. No author emails are exposed. Public content should be checked by the teacher before class. The deployment workflow tests private/public Firebase access rules in the local emulator before deploying Pages.

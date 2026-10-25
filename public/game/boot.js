@@ -6,5 +6,4 @@ window.addEventListener('pointerdown',()=>music.unlock(),{capture:true});window.
 button.onclick=()=>music.toggleMute();
 document.querySelector('#music-volume').oninput=e=>music.setVolume(Number(e.target.value)/100);
 document.querySelector('#music-mute').onclick=()=>music.toggleMute();
-document.querySelector('#effects-mute').onchange=e=>window.dispatchEvent(new CustomEvent('chase-effects',{detail:e.target.checked}));
 document.addEventListener('visibilitychange',()=>document.hidden?music.suspend('hidden'):music.resume('hidden'));
