@@ -92,3 +92,7 @@ Camera hops use the opposite horizontal direction and a smaller lateral threshol
 Keyboard/touch mode shows one independent control group per human player. Settings checks camera availability and shows current device connection status.
 
 The Public Question Bank reads the latest 30 opt-in community sets. Google-authenticated owners may publish up to 30 bounded sets and unpublish their own entries. Existing private banks are never automatically published. Publishing requires a saved set plus the public-sharing checkbox; copying a community set creates a new private draft for review. No author emails are exposed. Public content should be checked by the teacher before class. The deployment workflow tests private/public Firebase access rules in the local emulator before deploying Pages.
+
+### AI Assist suggestions
+
+The AI prompt builder supports Years 1–6 and 1–50 questions, with optional count suggestions from 10 to 50 in steps of five. Both question count and topic remain editable. Common grammar topic suggestions were selected from the KPM-authored [Primary Year 3 syllabus](https://padlet-uploads.storage.googleapis.com/214113651/37ce2f42feab7f3db297ab7a92f7586d/SyllabusYear_3.pdf) and [Year 6 DSKP, pages 45–46 and the Years 4–5 appendix](https://c.zoom-a.com/cache/dbp/refpub/1668665277967/DSKP-Th6-BI.pdf). They are convenient starting points, not a per-year curriculum coverage checklist. Teachers should review all generated questions.
