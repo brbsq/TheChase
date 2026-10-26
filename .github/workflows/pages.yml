@@ -43,3 +43,4 @@ jobs:
         run: node scripts/retire-pages-deployments.mjs
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          PAGES_DEPLOYMENT_SUCCESS: ${{ steps.deployment.outcome == 'success' }}
