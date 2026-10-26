@@ -1,5 +1,11 @@
 // Interface copy only. Teacher-authored content is never translated automatically.
 export const MESSAGES={
+ "A, B and C match the three answers. Wave your left hand or arm to hop left, or your right to hop right.":{"zh":"A、B、C 对应三个答案。挥动左臂向左跳，挥动右臂向右跳。","ms":"A, B dan C sepadan dengan tiga jawapan. Hayun lengan kiri untuk ke kiri, atau lengan kanan untuk ke kanan."},
+ "Wave your left hand or arm to hop left, or your right to hop right.":{"zh":"挥动左臂向左跳，挥动右臂向右跳。","ms":"Hayun lengan kiri untuk melompat ke kiri, atau lengan kanan untuk ke kanan."},
+ "Visible players locked! Find any remaining players. Calibrated! Jog in place. Wave your left hand or arm to hop left, or your right to hop right. Jump straight up for hurdles.":{"zh":"可见玩家已锁定！找到其他玩家。原地慢跑。挥动左臂向左跳，挥动右臂向右跳。向上跳跃跨栏。","ms":"Pemain dikunci! Cari pemain lain. Joging setempat. Hayun lengan kiri atau kanan untuk menukar lorong. Lompat tegak untuk halangan."},
+ "Tilt your upper body left or right. Wait for the hurdle.":{"zh":"上身向左或向右倾斜。等待跨栏。","ms":"Condongkan badan ke kiri atau kanan. Tunggu halangan."},
+ "Your set has been saved.":{"zh":"您的题组已保存。","ms":"Set anda telah disimpan."},
+ "OK":{"zh":"确定","ms":"OK"},
  "AI Assist":{"zh": "AI 助手", "ms": "Bantuan AI"},
  "Manual Creation":{"zh": "手动创建", "ms": "Penciptaan Manual"},
  "My Question Sets":{"zh": "我的题组", "ms": "Set Soalan Saya"},
@@ -2076,5 +2082,24 @@ export const MESSAGES={
 "Race results":{"zh": "比赛成绩", "ms": "Keputusan perlumbaan"},
 "Top finishers":{"zh": "领先选手", "ms": "Pelari teratas"},
 "View race details":{"zh": "查看比赛详情", "ms": "Lihat butiran perlumbaan"},
- "Show question counts":{"zh":"显示题数选项","ms":"Tunjukkan bilangan soalan"}
+ "Show question counts":{"zh":"显示题数选项","ms":"Tunjukkan bilangan soalan"},
+"Add and edit the classes you teach. Sign in to sync them across your devices.":{"zh": "添加和编辑您执教的班级。登录后可在设备之间同步。", "ms": "Tambah dan edit kelas anda. Log masuk untuk menyegerakkan antara peranti."},
+"Sign in to sync classes across your devices.":{"zh": "登录以在设备之间同步班级。", "ms": "Log masuk untuk menyegerakkan kelas antara peranti."},
+"Loading your classes…":{"zh": "正在载入您的班级…", "ms": "Memuatkan kelas anda…"},
+"Saving classes…":{"zh": "正在保存班级…", "ms": "Menyimpan kelas…"},
+"Classes synced with your account.":{"zh": "班级已与您的账户同步。", "ms": "Kelas disegerakkan dengan akaun anda."},
+"Classes could not sync. Your changes are kept on this device.":{"zh": "班级无法同步。您的更改仍保存在此设备上。", "ms": "Kelas tidak dapat disegerakkan. Perubahan disimpan pada peranti ini."},
+"Device menu":{"zh": "设备菜单", "ms": "Menu peranti"},
+"Full-screen camera":{"zh": "全屏摄像", "ms": "Kamera skrin penuh"},
+"Exit fullscreen":{"zh": "退出全屏", "ms": "Keluar skrin penuh"},
+"A live camera preview and movement controls are shared only with your paired game screen.":{"zh": "实时摄像预览和动作控制仅与配对的游戏屏幕共享。", "ms": "Pratonton kamera dan kawalan pergerakan hanya dikongsi dengan skrin permainan berpasangan."},
+"Choose camera source":{"zh": "选择摄像来源", "ms": "Pilih sumber kamera"},
+"Connected":{"zh": "已连接", "ms": "Disambungkan"},
+"Available":{"zh": "可用", "ms": "Tersedia"},
+"Not available":{"zh": "不可用", "ms": "Tidak tersedia"},
+"Pair an external device":{"zh": "配对外部设备", "ms": "Pasangkan peranti luaran"},
+"External camera active":{"zh": "外部摄像已启用", "ms": "Kamera luaran aktif"},
+"External camera ready. Players are locked.":{"zh": "外部摄像已准备好，玩家已锁定。", "ms": "Kamera luaran sedia. Pemain dikunci."},
+"External camera connected. Lock the players when ready.":{"zh": "外部摄像已连接，准备好后请锁定玩家。", "ms": "Kamera luaran disambungkan. Kunci pemain apabila bersedia."},
+"Waiting for the external device to enable its camera.":{"zh": "等待外部设备启用摄像头。", "ms": "Menunggu peranti luaran mengaktifkan kamera."}
 };

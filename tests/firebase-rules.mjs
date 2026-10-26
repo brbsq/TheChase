@@ -27,3 +27,17 @@ test('Firebase rules protect pair ownership, one camera claim, expiry and teache
  assert.equal((await request('publicSets/teacher_0','teacher','DELETE',undefined,'google.com')).status,200,'owner can unpublish');
 
 });
+
+test('teacher classes are private, validated, and merge separate device writes',async()=>{
+ const path='teacherClasses/class-teacher',record={name:'4A',year:4,archived:false,updatedAt:Date.now()};
+ assert.equal((await request(path+'/class-a','class-teacher','PUT',record,'google.com')).status,200);
+ assert.equal((await request(path+'/class-b','class-teacher','PUT',{...record,name:'4B',updatedAt:Date.now()},'google.com')).status,200);
+ const a=await request(path,'class-teacher','GET',undefined,'google.com');assert.equal(Object.keys(a.data).length,2);
+ assert.equal((await request(path,'different-teacher','GET',undefined,'google.com')).status,401);
+ assert.equal((await request(path,'class-teacher','GET')).status,401,'anonymous identity cannot read classes');
+ assert.equal((await request(path+'/class-a','different-teacher','PUT',record,'google.com')).status,401);
+ assert.equal((await request('teacherClasses/camera/class-a','camera','PUT',record)).status,401);
+ for(const invalid of [{name:''},{name:'x'.repeat(25)},{year:0},{year:7},{year:1.5},{archived:'no'},{updatedAt:Date.now()+60000},{extra:true}])assert.equal((await request(path+'/bad','class-teacher','PUT',{...record,...invalid},'google.com')).status,401);
+ assert.equal((await request(path+'/class-a','class-teacher','PUT',{...record,archived:true,updatedAt:Date.now()},'google.com')).status,200);
+ assert.equal((await request(path+'/class-a','class-teacher','DELETE',undefined,'google.com')).status,401,'removal uses a synced archive tombstone');
+});

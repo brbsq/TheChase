@@ -142,3 +142,21 @@
 #results{position:fixed;inset:0;display:flex;justify-content:flex-end;align-items:center;padding:28px 4vw;overflow:hidden;pointer-events:none;background:transparent;backdrop-filter:none}
 #results .results-dialog{width:40vw;max-width:560px;max-height:90svh;margin:0;overflow:auto;overscroll-behavior:contain;pointer-events:auto}
 @media(max-width:650px) and (orientation:portrait){#results{align-items:flex-end;padding:10px}#results .results-dialog{width:100%;max-width:none;max-height:59svh}}
+#class-sync-status{font-size:15px!important;line-height:1.5;margin:8px 0 18px;color:#235e92}
+.camera-source-menu{position:fixed;z-index:2000;display:grid;gap:10px;padding:12px;border:2px solid white;border-radius:20px;background:linear-gradient(140deg,#f2faff,#b8ddfc);box-shadow:0 8px 25px #14497a66}
+.camera-source-option{display:grid;gap:5px;text-align:left;padding:13px 16px;min-height:66px;border:1px solid white;border-radius:14px;color:#143b6d;background:#eef8ff}
+.camera-source-option strong{font-size:19px}.camera-source-option small{font-size:14px}.camera-source-option:disabled{opacity:.48;cursor:not-allowed;background:#dce4eb;color:#536477}
+.camera-source-option.connected{background:linear-gradient(#c8f7df,#8ce6b4);color:#075f38;border-color:#f1fff6}
+.camera-source-menu .text-button{font-size:16px;min-height:42px}
+body.external-device-mode #stadium,body.external-device-mode .menu-background,body.external-device-mode .vignette,body.external-device-mode #music-button{display:none!important}
+.external-device-menu{position:fixed;inset:0;background:linear-gradient(135deg,#e2f3ff,#a9d4f6);backdrop-filter:none;overflow:auto;z-index:80!important;padding:24px}
+.external-device-menu .join-dialog{width:min(780px,94vw);max-height:calc(100svh - 48px);overflow:auto}
+#phone-menu{display:block;width:auto;margin:0 0 18px auto;font-size:17px;min-height:44px;padding:10px 16px}
+#phone-fullscreen{position:absolute;right:10px;top:10px;z-index:6;width:auto;max-width:calc(100% - 20px);min-height:42px;padding:9px 13px;font-size:16px;background:#f5fbffdd;color:#123f73}
+#phone-video-wrap:fullscreen,#phone-video-wrap.camera-expanded{position:fixed;inset:0;width:100vw;height:100svh;aspect-ratio:auto;margin:0;border-radius:0;background:#061421;z-index:3000}
+#phone-video-wrap:fullscreen video,#phone-video-wrap.camera-expanded video{object-fit:contain}
+#phone-video-wrap:fullscreen canvas,#phone-video-wrap.camera-expanded canvas{object-fit:contain}
+body.camera-viewport-expanded{overflow:hidden}
+@media(max-width:650px){.external-device-menu{padding:12px}.external-device-menu .join-dialog{max-height:calc(100svh - 24px);padding:26px 20px}.external-device-menu .join-methods{grid-template-columns:1fr}.external-device-menu h2{font-size:30px}.external-device-menu label,.external-device-menu p{font-size:17px}.external-device-menu button{font-size:18px;min-height:48px}}
+
+#set-saved-screen{z-index:110;background:#12427699}.set-saved-dialog{width:min(480px,94vw);text-align:center}.set-saved-dialog h2{font-size:28px;margin:0 0 26px}.set-saved-dialog button{min-width:140px;font-size:20px}

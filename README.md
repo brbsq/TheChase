@@ -54,7 +54,7 @@ It checks owner/guest access, single camera claims, expiry, immutable answers, p
 
 ## Playing
 
-Questions appear before hurdles. Keep jogging, hop sideways to select a lane, then jump vertically during the highlighted final 1.25 seconds. Wrong answers and missed hurdles make only that runner fall and recover; opponents continue. Shared lanes and split screen retain all runners. Race targets can use questions, time, distance or endless chase.
+Questions appear before hurdles. Keep jogging, wave your left or right hand or arm to select a lane, then jump vertically during the highlighted final 1.25 seconds. Wrong answers and missed hurdles make only that runner fall and recover; opponents continue. Shared lanes and split screen retain all runners. Race targets can use questions, time, distance or endless chase.
 
 Keyboard: P1 arrows / Space / R; P2 A D / W / S; P3 J L / I / K; P4 F H / T / G. Music attempts autoplay at 50%, falls back to the first interaction, and has volume controls in Settings plus a mute button. Camera loss pauses the race rather than applying a jogging penalty.
 
@@ -124,3 +124,11 @@ Class selection uses the supplied classroom glyph with a transparent background,
 The canonical URL is https://brbsq.github.io/TheChase/. Its stable entry loader fetches `release.json` without caching and opens the current game HTML with a build fingerprint. Old `release` query labels are removed; phone pairing hashes and other parameters are preserved. Each Pages deployment replaces the live artifact. Superseded workflow runs are canceled, and the publish step checks that it still represents the latest `main` commit.
 
 After a successful publish, the workflow marks superseded successful Pages deployments inactive. It first verifies that the new deployment succeeded and still matches `main`; source commits and historical build records remain available for recovery.
+
+## Local account and external-camera preview
+
+On localhost, Firebase Auth and Realtime Database use the isolated `demo-thechase` emulators (ports 9099 and 9000). Run `firebase emulators:start --only auth,database --project demo-thechase` alongside the local server. Hosted URLs continue using the configured Firebase project.
+
+Classes sync privately under `teacherClasses/<uid>/<classId>` for signed-in teachers. Guest classes remain local and migrate once into the first signed-in account. Separate account caches, offline pending edits, and per-class writes prevent one account or device from replacing another's independent changes. Archiving and restoring a class sync across devices; selected class remains device-specific. Deploy the accompanying database rules only after preview approval.
+
+Enable camera opens a source menu in solo and multiplayer. External camera becomes available and green when a paired device supplies a live video track. The external controller has Device menu (PIN/QR entry) and Full-screen camera controls, with a viewport fallback for browsers without native fullscreen. Returning to its menu stops capture and disconnects the pairing session. Open `/game/index.html#device` directly for the device-only menu. Physical phone capture requires a reachable HTTPS origin; laptop localhost links cannot be opened from another device.

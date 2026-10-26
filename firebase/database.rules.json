@@ -146,6 +146,30 @@
           ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80"
         }
       }
+    },
+    "teacherClasses": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid && auth.token.firebase.sign_in_provider !== 'anonymous'",
+        "$id": {
+          ".write": "auth != null && auth.uid === $uid && auth.token.firebase.sign_in_provider !== 'anonymous' && newData.exists()",
+          ".validate": "$id.matches(/^[A-Za-z0-9_-]{1,80}$/) && newData.hasChildren(['name','year','archived','updatedAt'])",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24"
+          },
+          "year": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 6 && newData.val() % 1 === 0"
+          },
+          "archived": {
+            ".validate": "newData.isBoolean()"
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 15000"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
     }
   }
 }

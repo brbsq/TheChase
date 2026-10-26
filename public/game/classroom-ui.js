@@ -4,7 +4,7 @@ export class ClassroomUI{
   this.el('#class-form').onsubmit=event=>{event.preventDefault();try{store.save({id:this.editId,name:this.el('#class-name').value,year:Number(this.el('#class-year').value)});this.reset();this.render();this.el('#class-status').textContent='Class saved.';}catch(error){this.error(error.message);}};
   this.el('#class-name').oninput=()=>{const match=this.el('#class-name').value.match(/^([1-6])/);if(match)this.el('#class-year').value=match[1];};
   this.el('#class-cancel').onclick=()=>this.reset();this.el('#class-restore').onclick=()=>{try{store.restore();this.render();this.el('#class-status').textContent='Classes restored.';}catch(error){this.error(error.message);}};
-  this.el('#manage-classes').onclick=()=>{show('#class-picker-screen',false);manage();};window.addEventListener('chase-language',()=>this.render());this.render();
+  this.el('#manage-classes').onclick=()=>{show('#class-picker-screen',false);manage();};window.addEventListener('chase-language',()=>this.render());store.subscribe(()=>this.render());this.render();
  }
  el(selector){return document.querySelector(selector);}
  element(tag,text,className=''){const el=document.createElement(tag);el.textContent=text;el.className=className;return el;}
