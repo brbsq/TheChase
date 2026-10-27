@@ -1,0 +1,3 @@
+// Camera settings live below the view; only person targets stay over the image.
+export function cameraControlsBelow(view){if(!view?.parentNode?.insertBefore)return view;let panel=view.nextElementSibling;if(panel?.classList?.contains('camera-controls-below'))return panel;panel=document.createElement('div');panel.className='camera-controls-below';panel.setAttribute('aria-label','Camera controls');view.parentNode.insertBefore(panel,view.nextSibling);return panel;}
+export function removeEmptyCameraControls(panel){if(panel?.classList?.contains('camera-controls-below')&&!panel.children.length)panel.remove();}
