@@ -1,5 +1,11 @@
 // Interface copy only. Teacher-authored content is never translated automatically.
 export const MESSAGES={
+ "Camera FPS":{"zh":"摄像头帧率","ms":"FPS kamera"},
+ "Auto · 60 / 30 FPS":{"zh":"自动 · 60 / 30 帧","ms":"Auto · 60 / 30 FPS"},
+ "FPS not reported":{"zh":"未报告帧率","ms":"FPS tidak dilaporkan"},
+ "FPS change unavailable":{"zh":"无法更改帧率","ms":"FPS tidak dapat ditukar"},
+ "Auto frame after locking":{"zh":"锁定后自动框选","ms":"Bingkai automatik selepas dikunci"},
+ "Lock player ○":{"zh":"锁定玩家 ○","ms":"Kunci pemain ○"},
  "Camera":{"zh":"摄像头","ms":"Kamera"},
  "Rear camera":{"zh":"后置摄像头","ms":"Kamera belakang"},
  "Front camera":{"zh":"前置摄像头","ms":"Kamera hadapan"},
