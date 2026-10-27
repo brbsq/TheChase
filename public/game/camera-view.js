@@ -1,0 +1,4 @@
+export function cameraDimensions(width,height,rotation=0){return rotation%180?{width:height,height:width}:{width,height};}
+export function viewPoint(clientX,clientY,rect,width,height,mirrored=true){const scale=Math.min(rect.width/width,rect.height/height),x=(clientX-rect.left-(rect.width-width*scale)/2)/(width*scale),y=(clientY-rect.top-(rect.height-height*scale)/2)/(height*scale);return {x:Math.max(0,Math.min(1,mirrored?1-x:x)),y:Math.max(0,Math.min(1,y))};}
+export function selectionRegion(a,b){return {x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),width:Math.abs(a.x-b.x),height:Math.abs(a.y-b.y)};}
+export function regionLandmarks(landmarks,region){return landmarks.map(p=>({...p,x:region.x+p.x*region.width,y:region.y+p.y*region.height,visibility:p.x<0||p.x>1||p.y<0||p.y>1?0:(p.visibility??1)}));}

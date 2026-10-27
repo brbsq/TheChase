@@ -1,5 +1,9 @@
 // Interface copy only. Teacher-authored content is never translated automatically.
 export const MESSAGES={
+ "Camera":{"zh":"摄像头","ms":"Kamera"},
+ "Rear camera":{"zh":"后置摄像头","ms":"Kamera belakang"},
+ "Front camera":{"zh":"前置摄像头","ms":"Kamera hadapan"},
+ "Rotate view 90°":{"zh":"旋转画面 90°","ms":"Putar paparan 90°"},
  "A, B and C match the three answers. Wave your left hand or arm to hop left, or your right to hop right.":{"zh":"A、B、C 对应三个答案。挥动左臂向左跳，挥动右臂向右跳。","ms":"A, B dan C sepadan dengan tiga jawapan. Hayun lengan kiri untuk ke kiri, atau lengan kanan untuk ke kanan."},
  "Wave your left hand or arm to hop left, or your right to hop right.":{"zh":"挥动左臂向左跳，挥动右臂向右跳。","ms":"Hayun lengan kiri untuk melompat ke kiri, atau lengan kanan untuk ke kanan."},
  "Visible players locked! Find any remaining players. Calibrated! Jog in place. Wave your left hand or arm to hop left, or your right to hop right. Jump straight up for hurdles.":{"zh":"可见玩家已锁定！找到其他玩家。原地慢跑。挥动左臂向左跳，挥动右臂向右跳。向上跳跃跨栏。","ms":"Pemain dikunci! Cari pemain lain. Joging setempat. Hayun lengan kiri atau kanan untuk menukar lorong. Lompat tegak untuk halangan."},
