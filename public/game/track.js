@@ -12,4 +12,4 @@ export function trackFrame(distance,lateral=0){
 }
 
 // Preserve independent progress while keeping long race gaps in the shared view.
-export function runnerProgress(distance,focus){return focus+12*Math.tanh((distance-focus)/12)+1.8;}
+export function runnerProgress(distance,focus,spread=12){return focus+spread*Math.tanh((distance-focus)/spread)+1.8;}

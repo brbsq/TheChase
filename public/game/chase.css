@@ -1,3 +1,5 @@
+
+/* Independent player controls float over the track without a shared bar. */
 :root{--ink:#123464;--teal:#0878d7;--line:#ffffffd9;color:#123464;background:#2b8ee5}body{color:#123464}#app{height:100svh;min-height:480px;overflow:hidden}.menu-background{position:absolute;inset:0;background:#3896ed url('./art/chase-stadium.png') center/cover}.vignette{display:none}#stadium{visibility:hidden}body.racing #stadium{visibility:visible}body.racing .menu-background{display:none}.glass{background:linear-gradient(125deg,#ffffff91,#a8d8ff69);border:2px solid #ffffffd6;box-shadow:inset 0 2px 1px #fff,inset 0 -2px 5px #8ecaffaa,0 5px 10px #174d8240,0 0 0 5px #ffffff25;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
 #nav{inset:0 0 auto;height:14vh;max-height:115px;min-height:72px;background:linear-gradient(115deg,#f7faffdf,#bad8fcbb);border-bottom:3px solid #fff;box-shadow:0 4px 15px #1a61a355;padding:12px 4vw;z-index:7}.menu-back{align-self:flex-end;margin:0 0 -12px -4vw;padding:8px 65px 8px 3vw;border:2px solid #fff;border-left:0;color:white;background:linear-gradient(110deg,#233969c9,#5170a9c2);clip-path:polygon(0 0,88% 0,100% 100%,0 100%);font:italic 500 clamp(22px,3vw,42px) 'Outfit';min-width:300px;text-align:left}.chase-logo{position:relative;display:flex;width:365px;height:75px;margin-left:auto;text-decoration:none;align-items:center;justify-content:center;filter:drop-shadow(0 3px 2px #0871b390)}.chase-logo i{display:block;position:absolute;width:80px;height:66px;border:2px solid #f4ffff;border-radius:9px;transform:skewX(-18deg);background:linear-gradient(#ff7389,#ff124d);left:12px;box-shadow:inset 0 0 12px #fff9}.chase-logo i:nth-child(2){left:90px;background:linear-gradient(#42caff,#006fff)}.chase-logo i:nth-child(3){left:170px;background:linear-gradient(#38efab,#00af67)}.chase-logo i:nth-child(4){left:250px;background:linear-gradient(#ffec79,#ffbb00)}.chase-logo span{position:relative;color:#fff;font:italic 800 48px/.9 'Outfit';text-shadow:0 2px 0 #2352a0,2px 0 1px #1276c4,0 0 6px #186cca;letter-spacing:-.045em}.chase-logo small{font-size:30px}#nav #sound-button{margin-left:10px;background:#e7f3ffaa;border:1px solid #fff;border-radius:50%;width:38px;height:38px}
 #home.chase-menu{padding:0;inset:calc(14vh + 24px) 4vw 6vh;display:grid;grid-template-columns:42% 1fr;gap:24px;align-items:stretch}.menu-primary{display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:14px}.menu-feature{display:grid;grid-template-rows:minmax(0,1fr) 23%;gap:18px;min-height:0}.menu-secondary{display:grid;grid-template-columns:1fr 1fr;gap:16px}.menu-tile{display:flex;align-items:center;gap:22px;width:100%;padding:10px 16px;border-radius:24px;border:2px solid #fff;background:linear-gradient(120deg,#f4faffed,#d5e7ffdf);box-shadow:inset 0 2px 2px #fff,0 6px 8px #12579d60,0 0 0 5px #d2eaff30;color:#092957;text-align:left;min-height:0}.menu-tile:hover:not(:disabled){background:linear-gradient(120deg,#fff,#eaf9ff);transform:translateX(3px);box-shadow:0 0 0 3px #8cdbff,0 5px 12px #124c8d50}.menu-tile strong{font:700 clamp(18px,2.6vw,36px) 'Outfit';letter-spacing:-.02em;white-space:nowrap}.menu-tile>b{font:300 46px 'Outfit';margin-left:auto;color:#6682b5}.tile-icon{flex-shrink:0;display:grid;place-items:center;width:clamp(52px,8vw,110px);height:100%;max-height:90px;aspect-ratio:1.1;border:1px solid #fff9;border-radius:20px;color:white;font:700 54px 'Outfit';text-shadow:0 3px 3px #1738646b;box-shadow:inset 0 2px 6px #ffffff8c,0 2px 4px #5579ae30}.red{background:linear-gradient(#ff6c8e,#ff2d4c)}.blue{background:linear-gradient(#4bcbff,#0879ff)}.purple{background:linear-gradient(#b583ff,#723af8)}.violet{background:linear-gradient(#ac7dff,#6940ee)}.gold{background:linear-gradient(#ffe56c,#f6b900)}.mint{background:linear-gradient(#54f0ca,#00bdad)}.menu-secondary .menu-tile{gap:12px;padding:12px}.menu-secondary .tile-icon{width:30%;font-size:42px}.menu-secondary .menu-tile strong{font-size:clamp(17px,1.9vw,30px)}.menu-secondary .menu-tile>b{font-size:32px}.chase-keyart{position:relative;border-radius:28px;overflow:hidden;background:#409df2}.chase-keyart img{position:absolute;width:100%;height:133%;object-fit:cover;object-position:center top;top:-2%;left:0}
@@ -81,3 +83,36 @@ body:has(.modal-backdrop:not([hidden])) .music-button,body:has(#pack-picker:not(
 @media(max-width:700px){#teacher-screen .ai-settings{grid-template-columns:1fr 1fr;gap:18px}#teacher-screen .ai-settings label:last-child{grid-column:1/-1}#teacher-screen .ai-studio[open]{padding:18px}#audio-settings .settings-card{padding:20px}#audio-settings .settings-card h3{font-size:22px}#audio-settings .settings-card p{font-size:19px}}
 
 #teacher-screen .ai-content{display:grid;gap:24px;margin-top:22px}#teacher-screen .ai-content>p{margin:0}#teacher-screen #ai-status:empty,#teacher-screen #ai-drafts:empty{display:none}
+.player-controls{position:absolute;inset:0;display:block;pointer-events:none;z-index:8;background:transparent}
+.player-controls .player-control-row{position:absolute;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:26px 48px;gap:4px 7px;box-sizing:border-box;padding:0 10px;background:transparent;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;pointer-events:none}
+.player-controls .player-control-row strong{grid-row:1;grid-column:1 / 3;color:white;text-align:left;font-size:18px;text-shadow:0 1px 4px #123867,0 0 8px #123867;align-self:center}
+.player-controls .player-control-row button{pointer-events:auto;background:transparent;color:white;border:1.5px solid #fff;border-radius:14px;font-size:15px;min-width:0;min-height:44px;padding:4px;text-shadow:0 1px 3px #123867;box-shadow:0 1px 5px #12386755;touch-action:none}
+.player-controls .player-control-row .left-control{grid-row:2;grid-column:1}
+.player-controls .player-control-row .jump-control{grid-row:2;grid-column:2;background:transparent;border-color:var(--player);border-width:2px;color:white}
+.player-controls .player-control-row .right-control{grid-row:2;grid-column:3}
+.player-controls .player-control-row .jog-control{grid-row:1;grid-column:3;font-size:12px;min-height:24px;border:0;box-shadow:none}
+.player-controls .player-control-row button:active{background:#ffffff35;transform:scale(.95)}
+.player-controls .player-control-row button:focus-visible{outline:3px solid var(--player);outline-offset:2px}
+.racing .race-bottom{bottom:8px;pointer-events:none}
+.racing .race-bottom .control-dock.glass{background:transparent;border:0;box-shadow:none;backdrop-filter:none;padding:0;gap:12px;pointer-events:auto}
+.racing .race-bottom .controller-status{display:none}
+.finished #player-controls{display:none}
+@media(max-width:650px){.player-controls .player-control-row{column-gap:4px;padding:0 7px}.player-controls .player-control-row button{font-size:12px}.player-controls .player-control-row strong{font-size:15px}}
+
+/* Preserve usable player views on short classroom tablets and phone landscapes. */
+@media(max-height:500px) and (orientation:landscape){
+ .racing .race-top{top:6px;padding:5px 10px;gap:12px;min-height:0}
+ .racing .race-title strong{font-size:11px}.racing .race-title small{font-size:8px;margin-top:1px}
+ .racing .hud-stat{min-width:48px;padding-left:10px}.racing .hud-stat>span{font-size:8px}.racing .hud-stat strong{font-size:16px;margin-top:1px}
+ .racing .race-top .icon-button{width:34px;height:34px;min-width:34px}
+ .split-on .question-card{top:59px;padding:5px 10px 4px;border-radius:15px}
+ .split-on .question-meta{font-size:9px}.split-on .question-meta>button{font-size:9px}
+ .split-on .question-card h2{font-size:18px;line-height:1.1;margin:4px 0}
+ .split-on .answer-option{min-height:34px;font-size:16px;padding:3px 4px 16px;border-radius:9px}
+ .split-on .answer-player{font-size:10px;padding:1px 4px;min-width:0}
+ .split-on .question-bottom{font-size:9px;margin-top:3px}
+ .player-controls .player-control-row{grid-template-rows:20px 44px;row-gap:3px}
+ .player-controls .player-control-row strong{font-size:14px}.player-controls .player-control-row button{font-size:13px}
+ .racing .race-bottom .view-button{min-height:30px;padding:4px 10px;font-size:12px}
+ .split-label{font-size:14px;padding:3px 7px;border-radius:7px}
+}

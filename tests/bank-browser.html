@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>The Chase bank emulator checks</title>
+<style>body{font:16px system-ui;max-width:900px;margin:30px auto;padding:20px}button,input,select{font:inherit;padding:8px;margin:5px}section{border:1px solid #ccc;padding:16px;margin:16px 0}pre{white-space:pre-wrap}label{display:block}</style>
+<h1>Question bank · local emulator checks</h1><p>This test-only page is not included in published builds. It uses disposable Firebase emulator accounts.</p>
+<label>Test account<input id="account" value="bank-sync-review"></label><button id="login">Sign in to test account</button><button id="logout">Sign out</button>
+<p id="auth" role="status">Starting…</p><p id="status" role="status"></p>
+<section><label>Set ID<input id="set-id" value="browser-set"></label><label>Set title<input id="title" value="Browser test set"></label><button id="edit">Apply edit to draft</button><button id="incomplete">Add unfinished question</button><button id="approve">Approve test batch</button><button id="retry">Retry sync</button><button id="offline">Disconnect database</button><button id="online">Reconnect database</button></section>
+<section><h2>Current bank</h2><pre id="bank"></pre></section><section id="conflicts" hidden><h2>Conflict needs review</h2><div data-conflicts></div></section>
+<script type="module">
+import {firebase,CloudBank} from '/game/firebase-backend.js';
+import {BankSync} from '/game/bank-sync.js';import {BankStorage,bankEnvironment,bankSession} from '/game/bank-storage.js';import {SetLibrary} from '/game/set-library.js';import {BankConflicts} from '/game/bank-conflicts.js';
+if(!['localhost','127.0.0.1'].includes(location.hostname))throw Error('Local emulator only');
+const $=s=>document.querySelector(s),f=await firebase(),library=new SetLibrary(),cloud=new CloudBank();let sync;
+const conflicts=new BankConflicts($('#conflicts'),{resolve:(id,choice)=>sync.resolve(id,choice),show:visible=>$('#conflicts').hidden=!visible});
+sync=new BankSync(library,{store:new BankStorage(),cloud,environment:bankEnvironment(),session:bankSession(),legacyStorage:localStorage,onchange:state=>{$('#status').textContent=state.status;$('#bank').textContent=JSON.stringify({saved:library.saved,draft:library.draft,pending:!!sync?.pending},null,2);conflicts.render(state.conflicts);if(state.review)conflicts.open(state.conflicts);}});
+await sync.account(null);cloud.onchange=state=>{$('#auth').textContent=state.user?'Signed in: '+state.user.uid:'Signed out';sync.consume(state);};await cloud.start();
+$('#login').onclick=async()=>{try{const label=$('#account').value.replace(/[^a-z0-9-]/gi,'-'),encode=value=>btoa(JSON.stringify(value)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');const token=encode({alg:'none',typ:'JWT'})+'.'+encode({iss:'https://accounts.google.com',aud:'demo-thechase',sub:label,email:label+'@example.invalid',email_verified:true,name:'Emulator '+label})+'.';await f.a.signInWithCredential(f.auth,f.a.GoogleAuthProvider.credential(token));}catch(error){$('#auth').textContent=error.message;}};
+$('#logout').onclick=()=>cloud.signOut();
+$('#edit').onclick=()=>{const id=$('#set-id').value;let set=library.draft.find(s=>s.id===id);if(!set){set={id,title:$('#title').value,category:'Year 1',questions:[{prompt:'Which is an action?',options:['jump','blue','happy'],correct:0}]};library.draft.push(set);}else set.title=$('#title').value;library.activeId=id;sync.draftChanged();};
+$('#incomplete').onclick=()=>{library.active.questions.push({prompt:'',options:['','',''],correct:0});sync.draftChanged();};
+$('#approve').onclick=()=>{try{sync.approve(library.proposal()).catch(error=>$('#status').textContent=error.message);}catch(error){$('#status').textContent=error.message;}};
+$('#retry').onclick=()=>sync.flush();$('#offline').onclick=()=>f.d.goOffline(f.db);$('#online').onclick=()=>f.d.goOnline(f.db);
+</script></html>

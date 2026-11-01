@@ -2,6 +2,7 @@ import * as T from './vendor/three.module.js';
 import {AthleteLibrary,animationIntent} from './athletes.js';
 import {COLOURS,playerLabel} from './engine.js';
 import {trackFrame,TRACK_LENGTH,runnerProgress} from './track.js';
+import {raceViewports} from './race-view.js';
 const ease=x=>x*x*(3-2*x);
 export class Stadium{
  constructor(container){this.container=container;this.renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.05;container.append(this.renderer.domElement);this.scene=new T.Scene();this.scene.background=new T.Color(0x9bd4fa);this.scene.fog=new T.Fog(0x9bd4fa,120,350);this.scene.add(new T.HemisphereLight(0xfffbec,0x7eab95,2.5));const light=new T.DirectionalLight(0xffedd6,3.2);light.position.set(-22,38,18);this.scene.add(light);this.materials=new Map();this.runners=[];this.hurdles=[];this.stripes=[];this.time=0;this.travel=0;this.podiums=[];this.trees=[];this.clouds=[];this.reducedMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;this.view='shared';this.makeWorld();this.athletes=new AthleteLibrary();this.camera=new T.PerspectiveCamera(43,1,.1,300);this.cameras=Array.from({length:4},()=>new T.PerspectiveCamera(48,1,.1,300));this.resize();window.addEventListener('resize',()=>this.resize());}
@@ -52,17 +53,31 @@ for(let rank=1;rank<=4;rank++){const x=[0,-2.65,2.65,5.25][rank-1],height=[1.5,1
  let x=(lane-1)*3.6+offset,y=0,z=(p.rank-1)*.85-1.8;
  a.actor.play(animationIntent(p,race,entities.length));a.actor.update(race.paused?0:this.reducedMotion&&finished?0:dt);
  if(finished){x=[0,-2.65,2.65,5.25][p.rank-1];y=[1.5,1,.65,.22][p.rank-1];z=0;a.g.rotation.y=Math.PI;a.g.position.set(x,y,z);a.ring.visible=false;a.shadow.visible=false;}
- else{if(p.laneTween<1)x=((p.fromLane-1)+(p.lane-p.fromLane)*ease(p.laneTween))*3.6+offset;const f=trackFrame(runnerProgress(p.distance??0,this.travel),x);a.g.rotation.y=f.yaw;a.g.position.set(f.x,0,f.z);a.shadow.position.set(f.x,.025,f.z);a.ring.position.set(f.x,.04,f.z);a.shadow.visible=!p.caught;a.ring.visible=!p.caught;}
+ else{if(p.laneTween<1)x=((p.fromLane-1)+(p.lane-p.fromLane)*ease(p.laneTween))*3.6+offset;a.lateral=x;const f=trackFrame(runnerProgress(p.distance??0,this.travel),x);a.g.rotation.y=f.yaw;a.g.position.set(f.x,0,f.z);a.shadow.position.set(f.x,.025,f.z);a.ring.position.set(f.x,.04,f.z);a.shadow.visible=!p.caught;a.ring.visible=!p.caught;}
  a.g.visible=finished||!p.caught;a.tag.visible=!!race;const title=playerLabel(p);
  if(a.labelText!==title){const tag=this.playerTag(title,a.color);a.tag.material.map.dispose();a.tag.material.map=tag.material.map;a.tag.material.needsUpdate=true;a.tag.scale.set(1.48,.60,1);a.tag.position.y=3.7;tag.material.dispose();a.labelText=title;}
  });
  for(let i=entities.length;i<this.runners.length;i++){this.runners[i].g.visible=false;this.runners[i].shadow.visible=false;this.runners[i].ring.visible=false;}
  this.hurdles.forEach((h,i)=>{h.visible=race?.phase==='approach';const ahead=70-(race?race.phaseTime/race.actionDuration:0)*69.4;const f=trackFrame(this.travel+ahead,(i-1)*3.6);h.position.set(f.x,0,f.z);h.rotation.y=f.yaw;});
  const r=this.renderer;r.setScissorTest(false);r.setViewport(0,0,this.width,this.height);
- const positionCamera=(cam,aspect,fov,x,y,z,lookAhead)=>{cam.aspect=aspect;cam.fov=fov;const pos=trackFrame(this.travel-z,x),target=trackFrame(this.travel+lookAhead,0);cam.position.set(pos.x,y,pos.z);cam.lookAt(target.x,1,target.z);cam.updateProjectionMatrix();};
+ const positionCamera=(cam,aspect,fov,x,y,z,lookAhead,focus=this.travel)=>{cam.aspect=aspect;cam.fov=fov;const pos=trackFrame(focus-z,x),target=trackFrame(focus+lookAhead,x*.65);cam.position.set(pos.x,y,pos.z);cam.lookAt(target.x,1,target.z);cam.updateProjectionMatrix();};
  if(finished){r.clear();const portrait=this.width<650;const w=portrait?this.width:this.width*.55,h=portrait?this.height*.40:this.height;r.setViewport(0,portrait?this.height-h:0,w,h);r.setScissor(0,portrait?this.height-h:0,w,h);r.setScissorTest(true);this.camera.aspect=w/h;this.camera.fov=portrait?46:43;this.camera.position.set(1.2,6.2,Math.max(16,13/(w/h)));this.camera.lookAt(1.2,1.7,0);this.camera.updateProjectionMatrix();r.render(this.scene,this.camera);r.setScissorTest(false);return;}
  if(!race){this.camera.aspect=this.width/this.height;this.camera.fov=this.width<650?48:43;this.camera.position.set(12,7.5,27);this.camera.lookAt(1,1.1,1);this.camera.updateProjectionMatrix();r.render(this.scene,this.camera);return;}
  positionCamera(this.camera,this.width/this.height,this.width<600&&this.height>this.width?66:45,0,9.2,19,11);r.render(this.scene,this.camera);
- if(this.view==='split'&&race.players.length>1){const n=race.players.length,rows=n===2?1:2;const top=this.splitTop??(this.width<600&&this.height>this.width?310:this.height<500?190:238);const bottom=this.width<600&&this.height>this.width?190:this.height<500?100:125;const available=Math.max(90,this.height-top-bottom);r.setScissorTest(true);for(let i=0;i<n;i++){const w=this.width/2,h=available/rows,x=(i%2)*w,y=this.height-top-(Math.floor(i/2)+1)*h,cam=this.cameras[i];const fov=Math.max(15,Math.min(75,2*Math.atan(Math.tan(Math.PI/5)/(w/h))*180/Math.PI));positionCamera(cam,w/h,fov,(race.players[i].lane-1)*.4,8.7,21,6);r.setViewport(x,y,w-2,h-2);r.setScissor(x,y,w-2,h-2);this.runners.forEach((a,j)=>a.ring.material.opacity=j===i?1:.45);r.render(this.scene,cam);}r.setScissorTest(false);}else this.runners.forEach(a=>a.ring.material.opacity=.85);
+ if(this.view==='split'&&race.players.length>1){
+  const top=this.splitTop??238,bottom=this.splitBottom??58,views=raceViewports(this.width,this.height,race.players.length,top,bottom);
+  r.setScissorTest(true);
+  for(const view of views){
+   const {id:i,x,y,width:w,height:h}=view,focus=race.players[i].distance,cam=this.cameras[i];
+   // Each view has its own distance origin. Opponents retain their real order,
+   // with long gaps compressed so all runners remain in the local scene.
+   entities.forEach((p,j)=>{const a=this.runners[j];if(!a)return;const f=trackFrame(runnerProgress(p.distance,focus,8),a.lateral||0);a.g.position.set(f.x,0,f.z);a.g.rotation.y=f.yaw;a.shadow.position.set(f.x,.025,f.z);a.ring.position.set(f.x,.04,f.z);a.ring.material.opacity=j===i?1:.45;});
+   this.hurdles.forEach((h,j)=>{const ahead=70-race.phaseTime/race.actionDuration*69.4,f=trackFrame(focus+ahead,(j-1)*3.6);h.position.set(f.x,0,f.z);h.rotation.y=f.yaw;});
+   const fov=Math.max(35,Math.min(58,2*Math.atan(Math.tan(Math.PI/7)/(w/h))*180/Math.PI));
+   positionCamera(cam,w/h,fov,this.runners[i].lateral||0,8.8,22,4,focus);
+   r.setViewport(x,this.height-y-h,w-2,h-2);r.setScissor(x,this.height-y-h,w-2,h-2);r.render(this.scene,cam);
+  }
+  r.setScissorTest(false);
+ }else this.runners.forEach(a=>a.ring.material.opacity=.85);
  }
 }

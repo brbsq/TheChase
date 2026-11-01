@@ -1,5 +1,6 @@
 import {firebaseConfig} from './firebase-config.js';
 import {normalizeSets} from './set-library.js';
+import {mergeBanks,readBankRecord} from './bank-merge.js';
 export const cloudConfigured=()=>!!(firebaseConfig.apiKey&&firebaseConfig.projectId&&firebaseConfig.databaseURL);
 const SDK='https://www.gstatic.com/firebasejs/13.0.0/';
 const pending=new Map();
@@ -20,11 +21,53 @@ const pairing=new FirebasePairing();
 // Preserve the UI's request contract while using Firebase on static hosting.
 export async function pairRequest(path,options={}){if(!cloudConfigured()&&['localhost','127.0.0.1'].includes(location.hostname))return fetch(path,options);try{const url=new URL(path,location.origin),method=options.method||'GET';let data;if(method==='GET')data=url.searchParams.has('pin')?await pairing.lookup(url.searchParams.get('pin')):await pairing.read(url.searchParams.get('id'));else{const body=JSON.parse(options.body||'{}');if(method==='DELETE'){await pairing.remove(body.id);data={ok:true};}else data=body.offer?await pairing.create(body):await pairing.answer(body);}return {ok:true,json:async()=>data};}catch(e){return {ok:false,json:async()=>({error:e.message||'Firebase connection failed.'})};}}
 export class CloudBank {
- constructor(){this.user=null;this.revision=0;this.onchange=()=>{};}
- async start(){if(!cloudConfigured()){this.onchange({ready:false});return;}const f=await firebase();f.a.onAuthStateChanged(f.auth,async user=>{this.user=user&&!user.isAnonymous?user:null;this.revision=0;if(!this.user){this.onchange({ready:true,user:null});return;}try{const record=(await f.d.get(f.d.ref(f.db,'questionBanks/'+user.uid+'/custom'))).val();if(f.auth.currentUser?.uid!==user.uid)return;let sets=null;if(record){sets=normalizeSets(JSON.parse(record.setsJSON??record.questionsJSON));this.revision=record.revision;}this.onchange({ready:true,user,sets});}catch(error){this.onchange({ready:true,user,error});}});}
- async signIn(){const f=await firebase();await f.a.signInWithPopup(f.auth,new f.a.GoogleAuthProvider());}
- async signOut(){const f=await firebase();await f.a.signOut(f.auth);}
- async save(sets){if(!this.user)throw Error('Sign in to save your question bank to Firebase.');const setsJSON=JSON.stringify(normalizeSets(sets));if(setsJSON.length>950000)throw Error('Question bank is too large.');const f=await firebase(),uid=this.user.uid,expected=this.revision;const result=await f.d.runTransaction(f.d.ref(f.db,'questionBanks/'+uid+'/custom'),current=>{if((current?.revision||0)!==expected)return;return {setsJSON,revision:expected+1,updatedAt:f.d.serverTimestamp()};},{applyLocally:false});if(!result.committed)throw Error('This bank changed on another device. Sign out and in to load the latest version before saving.');this.revision=expected+1;}
+ constructor({identity=()=>firebase(),configured=cloudConfigured}={}){Object.assign(this,{identity,configured});this.user=null;this.revision=0;this.ready=false;this.online=false;this.epoch=0;this.onchange=()=>{};}
+ emit(extra={}){this.onchange({ready:this.ready,user:this.user,online:this.online,...extra});}
+ async start(){
+  if(!this.configured()){this.emit({disabled:true});return;}
+  const f=await this.identity();
+  this.stopAuth=f.a.onAuthStateChanged(f.auth,user=>{
+   const epoch=++this.epoch;this.stopBank?.();this.stopConnection?.();this.stopBank=this.stopConnection=null;
+   this.user=user&&!user.isAnonymous?user:null;this.revision=0;this.ready=false;this.online=false;
+   if(!this.user){this.ready=true;this.emit();return;}
+   this.emit({loading:true});
+   this.stopConnection=f.d.onValue(f.d.ref(f.db,'.info/connected'),snapshot=>{if(epoch!==this.epoch)return;this.online=snapshot.val()===true;this.emit();});
+   this.stopBank=f.d.onValue(f.d.ref(f.db,'questionBanks/'+user.uid+'/custom'),snapshot=>{
+    if(epoch!==this.epoch)return;
+    try{const record=readBankRecord(snapshot.val());this.revision=record.revision;this.ready=true;this.emit({sets:record.sets});}
+    catch(error){this.ready=false;this.emit({error});}
+   },error=>{if(epoch===this.epoch){this.ready=false;this.emit({error});}});
+  });
+ }
+ async signIn(){const f=await this.identity();await f.a.signInWithPopup(f.auth,new f.a.GoogleAuthProvider());}
+ async signOut(){const f=await this.identity();await f.a.signOut(f.auth);}
+ async save({base,sets,choices={}}){
+  if(!this.user)throw Error('Sign in to sync your question bank.');
+  if(!this.ready||!this.online)throw Error('Waiting for a Firebase connection. Your approved save is kept on this device.');
+  base=normalizeSets(base);sets=normalizeSets(sets);
+  const uid=this.user.uid,epoch=this.epoch,f=await this.identity();
+  const currentAccount=()=>epoch===this.epoch&&this.user?.uid===uid&&f.auth.currentUser?.uid===uid;
+  if(!currentAccount())return {status:'cancelled'};
+  const ref=f.d.ref(f.db,'questionBanks/'+uid+'/custom');
+  for(let attempt=0;attempt<3;attempt++){
+   let outcome=null,cold=false;
+   const result=await f.d.runTransaction(ref,current=>{
+    if(!currentAccount())return;
+    // The SDK can initially supply null for an uncached existing record. Load
+    // it before reporting a deletion conflict or attempting revision 1.
+    if(current===null&&this.revision>0){cold=true;return;}
+    cold=false;const remote=readBankRecord(current);outcome=mergeBanks(base,sets,remote.sets,choices);
+    if(outcome.conflicts.length)return;
+    return {setsJSON:JSON.stringify(outcome.sets),revision:remote.revision+1,updatedAt:f.d.serverTimestamp()};
+   },{applyLocally:false});
+   if(!currentAccount())return {status:'cancelled'};
+   if(cold){const snapshot=await f.d.get(ref);if(!currentAccount())return {status:'cancelled'};this.revision=readBankRecord(snapshot.val()).revision;continue;}
+   if(result.committed){const saved=readBankRecord(result.snapshot.val());this.revision=saved.revision;return {status:'saved',...saved};}
+   if(outcome?.conflicts.length)return {status:'conflict',conflicts:outcome.conflicts};
+  }
+  throw Error('Cloud data could not be confirmed. Your approved save is kept locally; retry syncing.');
+ }
+ stop(){this.epoch++;this.stopAuth?.();this.stopBank?.();this.stopConnection?.();this.ready=false;}
 }
 
 // Classes are private per teacher; each class is written separately so devices merge independent edits.
