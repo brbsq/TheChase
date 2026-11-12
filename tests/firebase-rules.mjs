@@ -29,7 +29,7 @@ test('Firebase rules protect pair ownership, one camera claim, expiry and teache
 });
 
 test('teacher classes are private, validated, and merge separate device writes',async()=>{
- const path='teacherClasses/class-teacher',record={name:'4A',year:4,archived:false,updatedAt:Date.now()};
+ const path='teacherClasses/class-teacher',record={name:'4A',year:4,archived:false,studentsJSON:JSON.stringify([{id:'pupil-a',name:'Test Student'}]),updatedAt:Date.now()};
  assert.equal((await request(path+'/class-a','class-teacher','PUT',record,'google.com')).status,200);
  assert.equal((await request(path+'/class-b','class-teacher','PUT',{...record,name:'4B',updatedAt:Date.now()},'google.com')).status,200);
  const a=await request(path,'class-teacher','GET',undefined,'google.com');assert.equal(Object.keys(a.data).length,2);
@@ -37,7 +37,7 @@ test('teacher classes are private, validated, and merge separate device writes',
  assert.equal((await request(path,'class-teacher','GET')).status,401,'anonymous identity cannot read classes');
  assert.equal((await request(path+'/class-a','different-teacher','PUT',record,'google.com')).status,401);
  assert.equal((await request('teacherClasses/camera/class-a','camera','PUT',record)).status,401);
- for(const invalid of [{name:''},{name:'x'.repeat(25)},{year:0},{year:7},{year:1.5},{archived:'no'},{updatedAt:Date.now()+60000},{extra:true}])assert.equal((await request(path+'/bad','class-teacher','PUT',{...record,...invalid},'google.com')).status,401);
+ for(const invalid of [{name:''},{name:'x'.repeat(25)},{year:0},{year:7},{year:1.5},{archived:'no'},{studentsJSON:123},{studentsJSON:'x'.repeat(20001)},{updatedAt:Date.now()+60000},{extra:true}])assert.equal((await request(path+'/bad','class-teacher','PUT',{...record,...invalid},'google.com')).status,401);
  assert.equal((await request(path+'/class-a','class-teacher','PUT',{...record,archived:true,updatedAt:Date.now()},'google.com')).status,200);
  assert.equal((await request(path+'/class-a','class-teacher','DELETE',undefined,'google.com')).status,401,'removal uses a synced archive tombstone');
 });

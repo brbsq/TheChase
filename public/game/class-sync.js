@@ -1,5 +1,6 @@
+import {normalizeRoster} from './student-roster.js';
 import {classSnapshot} from './classrooms.js';
-export function cloudClassRecords(value){return Object.entries(value||{}).map(([id,row])=>({...row,id})).filter(row=>classSnapshot(row)&&typeof row.archived==='boolean').slice(0,120);}
+export function cloudClassRecords(value){return Object.entries(value||{}).flatMap(([id,row])=>{try{const {studentsJSON,...record}=row;return [{...record,id,students:normalizeRoster(studentsJSON?JSON.parse(studentsJSON):row.students||[])}];}catch{return [];}}).filter(row=>classSnapshot(row)&&typeof row.archived==='boolean').slice(0,120);}
 export class ClassSync{
  constructor(store,{storage,subscribe,save,status=()=>{}}){Object.assign(this,{store,storage,subscribe,save,status});this.uid=null;this.epoch=0;this.pending=new Map();this.remote=[];this.before=store.records;this.ready=false;this.flushTask=null;store.subscribe(event=>{if(event.source==='local'&&this.uid){for(const row of event.records)if(JSON.stringify(row)!==JSON.stringify(this.before.find(r=>r.id===row.id)))this.pending.set(row.id,row);this.persist();this.flush();}this.before=event.records;});}
  queueKey(){return 'chase-class-pending:'+this.uid;}
@@ -11,7 +12,7 @@ export class ClassSync{
    const owner=this.storage.getItem('chase-classrooms-guest-owner');if(!owner&&guest.length){for(const row of guest)this.pending.set(row.id,row);this.storage.setItem('chase-classrooms-guest-owner',uid);this.persist();}
    this.status('Loading your classes…');const stop=await this.subscribe(uid,value=>{if(epoch!==this.epoch)return;this.remote=cloudClassRecords(value);this.ready=true;
     // Merge a former guest class into an existing matching class without duplicating it.
-    for(const [id,row] of this.pending)if(!this.remote.some(r=>r.id===id)&&this.remote.some(r=>r.name.toLocaleLowerCase()===row.name.toLocaleLowerCase()&&r.year===row.year&&r.archived===row.archived))this.pending.delete(id);
+    for(const [id,row] of this.pending)if(!this.remote.some(r=>r.id===id)&&this.remote.some(r=>r.name.toLocaleLowerCase()===row.name.toLocaleLowerCase()&&r.year===row.year&&r.archived===row.archived&&JSON.stringify(r.students||[])===JSON.stringify(row.students||[])))this.pending.delete(id);
     this.persist();this.reconcile();this.flush();
    },()=>{if(epoch===this.epoch){this.ready=false;this.status('Classes could not sync. Your changes are kept on this device.');}});
    if(epoch===this.epoch)this.stop=stop;else stop?.();

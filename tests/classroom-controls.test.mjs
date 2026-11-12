@@ -37,3 +37,23 @@ test('simultaneous arm swings are ignored and a two-foot jump takes priority',()
 test('small wrist and hand waves work without moving the elbow',()=>{for(const [joint,kind] of [[15,'left'],[16,'right'],[19,'left'],[20,'right']]){const m=new MotionInterpreter(1);m.calibrate([pose()]);const p=pose();p[joint].x+=.026;assert.equal(m.update([p],0).events[0]?.kind,kind);assert.deepEqual(m.update([p],33).events,[]);}});
 test('waves work at a raised resting position without lowering the arm between them',()=>{const m=new MotionInterpreter(1),raised=pose();for(const j of [13,15,17,19,21])raised[j].y-=.2;m.calibrate([raised]);const wave=structuredClone(raised);wave[15].x+=.03;assert.equal(m.update([wave],0).events[0]?.kind,'left');m.update([raised],33);assert.equal(m.update([wave],66).events[0]?.kind,'left');});
 test('a held raised hand becomes a new resting position without repeated hops',()=>{const m=new MotionInterpreter(1);m.calibrate([pose()]);const raised=pose();raised[15].y-=.15;assert.equal(m.update([raised],0).events[0]?.kind,'left');for(const t of [33,100,200,240])assert.deepEqual(m.update([raised],t).events,[]);const wave=structuredClone(raised);wave[15].x+=.03;assert.equal(m.update([wave],273).events[0]?.kind,'left');});
+
+
+test('waves remain responsive with hidden knees and ankles, while jumps are suppressed',()=>{
+ const m=new MotionInterpreter(1);m.calibrate([pose()]);const p=pose();for(const i of [25,26,27,28])p[i].visibility=0;p[15].x+=.04;
+ const out=m.update([p],20);assert.equal(out.detected,1);assert.deepEqual(out.events.map(e=>e.kind),['left']);
+});
+test('feet returning in a raised position do not manufacture a jump',()=>{
+ const m=new MotionInterpreter(1);m.calibrate([pose()]);const hidden=pose();hidden[27].visibility=0;m.update([hidden],20);
+ assert.deepEqual(m.update([pose(.5,.46,.86)],50).events,[]);assert.deepEqual(m.update([pose(.5,.46,.86)],160).events,[]);
+ assert.equal(m.update([pose(.5,.435,.835)],200).events[0]?.kind,'jump');
+});
+test('individual wrist reappearance resets its origin without generating a wave',()=>{
+ const m=new MotionInterpreter(1);m.calibrate([pose()]);const hidden=pose();hidden[15].visibility=0;m.update([hidden],20);
+ const back=pose();back[15].x+=.1;assert.deepEqual(m.update([back],40).events,[]);
+ const wave=structuredClone(back);wave[15].x+=.04;assert.equal(m.update([wave],60).events[0]?.kind,'left');
+});
+test('knees returning do not create a synthetic jogging step',()=>{
+ const m=new MotionInterpreter(1);m.calibrate([pose()]);const hidden=pose();hidden[25].visibility=0;m.update([hidden],20);
+ assert.equal(m.update([pose(.5,.5,.9,.04)],40).players[0].jogging,false);
+});

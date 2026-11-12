@@ -75,5 +75,5 @@ export class CloudClasses{
  constructor({identity=()=>firebase()}={}){this.identity=identity;}
  async start(onAccount){const f=await this.identity();return f.a.onAuthStateChanged(f.auth,user=>onAccount(user&&!user.isAnonymous?user.uid:null));}
  async subscribe(uid,onValue,onError){const f=await this.identity();return f.d.onValue(f.d.ref(f.db,'teacherClasses/'+uid),snapshot=>onValue(snapshot.val()),onError);}
- async save(uid,row){const f=await this.identity();if(f.auth.currentUser?.uid!==uid||f.auth.currentUser.isAnonymous)throw Error('Sign in to sync classes.');const result=await f.d.runTransaction(f.d.ref(f.db,'teacherClasses/'+uid+'/'+row.id),()=>({name:row.name,year:row.year,archived:row.archived,updatedAt:f.d.serverTimestamp()}),{applyLocally:false});if(!result.committed)throw Error('Class could not sync.');}
+ async save(uid,row){const f=await this.identity();if(f.auth.currentUser?.uid!==uid||f.auth.currentUser.isAnonymous)throw Error('Sign in to sync classes.');const result=await f.d.runTransaction(f.d.ref(f.db,'teacherClasses/'+uid+'/'+row.id),()=>({name:row.name,year:row.year,archived:row.archived,studentsJSON:JSON.stringify(row.students||[]),updatedAt:f.d.serverTimestamp()}),{applyLocally:false});if(!result.committed)throw Error('Class could not sync.');}
 }

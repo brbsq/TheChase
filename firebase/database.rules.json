@@ -167,6 +167,9 @@
           },
           "$other": {
             ".validate": false
+          },
+          "studentsJSON": {
+            ".validate": "newData.isString() && newData.val().length <= 20000"
           }
         }
       }
